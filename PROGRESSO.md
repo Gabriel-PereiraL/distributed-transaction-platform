@@ -3,7 +3,7 @@
 
 ## Checkpoint final de publicação
 
-Publicação GitHub autorizada explicitamente; somente fontes, documentação e snapshots, sem toolchains, clones dos Hubs, segredos, targets ou logs brutos. Conta autenticada Gabriel-PereiraL. Repositório público criado: https://github.com/Gabriel-PereiraL/distributed-transaction-platform. Inclui auditoria dos Hubs somente como documento de referência. Push final será conferido comparando HEAD com origin/main; o próprio commit deste checkpoint identifica a versão de encerramento.
+Publicação GitHub autorizada explicitamente; somente fontes, documentação e snapshots, sem toolchains, clones dos Hubs, segredos, targets ou logs brutos. Conta autenticada Gabriel-PereiraL. Repositório público: https://github.com/Gabriel-PereiraL/distributed-transaction-platform. Push inicial confirmado em main, commit `8b7f87b`; inclui 163 arquivos e os quatro snapshots históricos. Auditoria dos Hubs incluída somente como documento de referência. Commit final deste checkpoint registra o encerramento; conferir HEAD igual ao remoto. Trabalho encerrado por hoje: aguardar nova solicitação do usuário para retomar F5.
 
 F4 congelada em outputs/dtp-seguranca-f4.zip: 149 arquivos, 231379 bytes, SHA256 `67f5a136869913977c8cb4440fe4d1ed7b2ca05fcf3a81c2b51e1614f8970bb3`. Não sobrescrever esse arquivo com F5.
 

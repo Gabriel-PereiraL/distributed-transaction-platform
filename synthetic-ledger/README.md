@@ -109,4 +109,3 @@ Use signed realm roles together with operation scopes: `transfer-client` for adm
 # Checkpoint de publicação — 11/10/2026
 
 F0–F4 concluídas; F4 validada com 129 testes. O código inclui F5 parcial de tracing, cujo gate ainda não foi concluído: três novos testes unitários passaram, mas a última regressão Kafka teve um timeout no cenário de broker indisponível. Consulte [o progresso](../PROGRESSO.md) antes de retomar.
-
