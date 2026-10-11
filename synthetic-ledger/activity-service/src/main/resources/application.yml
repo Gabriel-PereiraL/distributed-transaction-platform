@@ -1,0 +1,69 @@
+spring:
+  application:
+    name: dtp-activity
+  mongodb:
+    uri: ${DTP_MONGO_URI}
+  data:
+    mongodb:
+      auto-index-creation: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${DTP_ISSUER}
+          jwk-set-uri: ${DTP_JWK_SET_URI}
+  kafka:
+    bootstrap-servers: ${DTP_KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      max-poll-records: 1
+      properties:
+        max.poll.interval.ms: 120000
+        allow.auto.create.topics: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        max.block.ms: 3000
+        request.timeout.ms: 2000
+        delivery.timeout.ms: 8000
+        max.request.size: 131072
+    admin:
+      fail-fast: true
+    listener:
+      missing-topics-fatal: true
+dtp:
+  activity:
+    prefix: ${DTP_ACTIVITY_PREFIX:activity_v1}
+    group: ${DTP_ACTIVITY_GROUP:activity-v1}
+    audience: ${DTP_ACTIVITY_AUDIENCE:dtp-activity}
+    listener-enabled: true
+  kafka:
+    events-topic: ${DTP_EVENTS_TOPIC:dtp.transfer-events.v1}
+    dlt-topic: ${DTP_ACTIVITY_DLT_TOPIC:dtp.activity.v1.dlt}
+server:
+  address: ${DTP_BIND_ADDRESS:127.0.0.1}
+  port: ${DTP_ACTIVITY_PORT:8086}
+  forward-headers-strategy: none
+  max-http-request-header-size: 16KB
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,mongo
+logging:
+  structured:
+    format:
+      console: ecs

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:dtp:transfer-accepted:v1",
+  "title": "TransferAccepted v1 — canonical event, not a posted transfer",
+  "type": "object",
+  "required": ["eventId", "eventType", "schemaVersion", "tenantId", "aggregateId", "aggregateVersion", "occurredAt", "payload", "correlationId"],
+  "properties": {
+    "eventId": {"type": "string", "format": "uuid"},
+    "eventType": {"const": "TransferAccepted"},
+    "schemaVersion": {"const": 1},
+    "tenantId": {"type": "string", "format": "uuid"},
+    "aggregateId": {"type": "string", "format": "uuid"},
+    "aggregateVersion": {"const": 1},
+    "occurredAt": {"type": "string", "format": "date-time"},
+    "correlationId": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$"},
+    "traceparent": {"type": ["string", "null"], "pattern": "^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$"},
+    "payload": {
+      "type": "object",
+      "required": ["id", "tenantId", "initiatedBy", "sourceAccountId", "destinationAccountId", "amount", "acceptedAt", "ruleVersion"],
+      "properties": {
+        "id": {"type": "string", "format": "uuid"},
+        "tenantId": {"type": "string", "format": "uuid"},
+        "initiatedBy": {"type": "string", "maxLength": 128},
+        "sourceAccountId": {"type": "string", "format": "uuid"},
+        "destinationAccountId": {"type": "string", "format": "uuid"},
+        "amount": {
+          "type": "object", "required": ["cents", "currency"],
+          "properties": {"cents": {"type": "integer", "minimum": 1, "maximum": 1000000000}, "currency": {"const": "BRL"}}
+        },
+        "acceptedAt": {"type": "string", "format": "date-time"},
+        "ruleVersion": {"const": "synthetic-v1"}
+      }
+    }
+  }
+}

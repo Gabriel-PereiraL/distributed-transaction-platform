@@ -1,0 +1,14 @@
+**/target/
+**/.env
+**/.env.*
+!**/.env.example
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+**/terraform.tfstate*
+**/.terraform/
+.idea/
+.vscode/

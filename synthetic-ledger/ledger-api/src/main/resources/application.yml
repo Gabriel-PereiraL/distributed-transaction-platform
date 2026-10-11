@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: dtp-ledger-api
+  datasource:
+    url: ${DTP_DATABASE_URL}
+    username: ${DTP_DATABASE_USER}
+    password: ${DTP_DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 5000
+      data-source-properties:
+        connectTimeout: 5
+        socketTimeout: 15
+        tcpKeepAlive: true
+      connection-init-sql: SET lock_timeout = '5s'
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate.jdbc.time_zone: UTC
+  data:
+    redis:
+      host: ${DTP_REDIS_HOST:127.0.0.1}
+      port: ${DTP_REDIS_PORT:6379}
+      password: ${DTP_REDIS_PASSWORD:}
+      connect-timeout: 1s
+      timeout: 1s
+      repositories:
+        enabled: false
+  flyway:
+    enabled: ${DTP_MIGRATE_ON_START:false}
+  jackson:
+    mapper:
+      allow-coercion-of-scalars: false
+    deserialization:
+      fail-on-unknown-properties: true
+      accept-float-as-int: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${DTP_ISSUER}
+          jwk-set-uri: ${DTP_JWK_SET_URI}
+dtp:
+  audience: ${DTP_AUDIENCE:dtp-ledger}
+  quota:
+    enabled: ${DTP_QUOTA_ENABLED:true}
+    limit: ${DTP_QUOTA_LIMIT:60}
+    window-ms: ${DTP_QUOTA_WINDOW_MS:60000}
+server:
+  address: ${DTP_BIND_ADDRESS:127.0.0.1}
+  port: ${DTP_PORT:8085}
+  forward-headers-strategy: none
+  max-http-request-header-size: 16KB
+  tomcat:
+    max-http-form-post-size: 16KB
+    connection-timeout: 5s
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,db
+logging:
+  structured:
+    format:
+      console: ecs

@@ -1,0 +1,18 @@
+{
+ "$schema":"https://json-schema.org/draft/2020-12/schema",
+ "$id":"urn:dtp:quarantine:v1",
+ "title":"Bounded operational quarantine envelope",
+ "type":"object","additionalProperties":false,
+ "required":["schemaVersion","sourceTopic","sourcePartition","sourceOffset","reason","sha256","originalBytes","bytesBase64","truncated"],
+ "properties":{
+  "schemaVersion":{"const":1},
+  "sourceTopic":{"type":"string","minLength":1,"maxLength":249},
+  "sourcePartition":{"type":"integer","minimum":0},
+  "sourceOffset":{"type":"integer","minimum":0},
+  "reason":{"enum":["INVALID_EVENT","RETRIES_EXHAUSTED"]},
+  "sha256":{"type":"string","pattern":"^[0-9a-f]{64}$"},
+  "originalBytes":{"type":"integer","minimum":0},
+  "bytesBase64":{"type":"string","maxLength":87384,"contentEncoding":"base64"},
+  "truncated":{"type":"boolean"}
+ }
+}

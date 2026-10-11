@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: dtp-ledger-worker
+  main:
+    web-application-type: none
+  datasource:
+    url: ${DTP_DATABASE_URL}
+    username: ${DTP_DATABASE_USER}
+    password: ${DTP_DATABASE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 5000
+      data-source-properties:
+        connectTimeout: 5
+        socketTimeout: 15
+        tcpKeepAlive: true
+      connection-init-sql: SET lock_timeout = '5s'
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: false
+  kafka:
+    bootstrap-servers: ${DTP_KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      enable-auto-commit: false
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      max-poll-records: 1
+      properties:
+        max.poll.interval.ms: 120000
+        allow.auto.create.topics: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        max.block.ms: 3000
+        request.timeout.ms: 2000
+        delivery.timeout.ms: 8000
+        max.request.size: 131072
+    listener:
+      ack-mode: record
+      concurrency: 1
+      missing-topics-fatal: true
+    admin:
+      fail-fast: true
+dtp:
+  kafka:
+    events-topic: dtp.transfer-events.v1
+    dlt-topic: dtp.transfer-events.v1.dlt
+    posting-group: ledger-posting-v1
+  publisher:
+    enabled: true
+  recovery:
+    enabled: false
+    age-seconds: 300
+logging:
+  structured:
+    format:
+      console: ecs
+management:
+  tracing:
+    export:
+      otlp:
+        enabled: false
+  logging:
+    export:
+      otlp:
+        enabled: false

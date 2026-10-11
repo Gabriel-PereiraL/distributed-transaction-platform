@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-11",
+  "command": "./mvnw.cmd -B -ntp -Pintegration clean verify",
+  "result": "BUILD SUCCESS",
+  "tests": 94,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "reactorDuration": "06:15 min",
+  "suites": [
+    {
+      "module": "ledger-domain",
+      "suite": "dev.dtp.domain.DomainTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-domain",
+      "suite": "dev.dtp.domain.PostingPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-application",
+      "suite": "dev.dtp.application.AdmissionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "event-contracts",
+      "suite": "dev.dtp.contracts.TransferEventDecoderTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.ArchitectureTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.FoundationIT",
+      "tests": 31,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.GlobalQuotaIT",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-worker",
+      "suite": "dev.dtp.worker.KafkaPostingIT",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "activity-service",
+      "suite": "dev.dtp.activity.ProjectionArchitectureTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "activity-service",
+      "suite": "dev.dtp.activity.ActivityProjectionIT",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "followup": "activity-service -am verify passed after test-only HTTP sample capture; both OpenAPI documents and real HTTP/event samples validated",
+  "mongo": {
+    "version": "8.0.32",
+    "digest": "sha256:d0d926f94df099bff534b7ee5b5986458131a22489dfff8664509af0c1e2ca9c"
+  },
+  "redis": {
+    "version": "7.4.11",
+    "digest": "sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499"
+  },
+  "evidence": [
+    "two HTTP APIs share six-request quota across 20 concurrent calls",
+    "Redis pause fails closed before SQL",
+    "Mongo pause returns read 503",
+    "history-before-snapshot failure heals on duplicate redelivery",
+    "concurrent v1/v2 converges monotonically",
+    "independent observer group receives both facts",
+    "new group/collections reconstruct identical receipt excluding projection time",
+    "JWT scope/audience/tenant/owner enforced",
+    "Activity has no ledger/JPA dependency"
+  ],
+  "limits": [
+    "no HA/rebalance/throughput guarantee",
+    "independent observer is not a full financial worker E2E",
+    "replay bounded by Kafka retention",
+    "recipient incoming activity not implemented",
+    "no cache",
+    "producer trust/ACLs/Keycloak pending F4",
+    "Mongo writes not atomically co-visible",
+    "no cloud/deploy/apply"
+  ]
+}

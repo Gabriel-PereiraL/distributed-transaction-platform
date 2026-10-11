@@ -1,0 +1,14 @@
+# Local secure profile: bootstrap topics/ACLs separately with an administrative identity.
+spring:
+  kafka:
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="worker" password="${DTP_KAFKA_WORKER_PASSWORD}";'
+      ssl.truststore.location: ${DTP_KAFKA_TRUSTSTORE}
+      ssl.truststore.password: ${DTP_KAFKA_TRUSTSTORE_PASSWORD}
+      ssl.truststore.type: PKCS12
+      ssl.endpoint.identification.algorithm: https
+dtp:
+  kafka:
+    create-topics: false

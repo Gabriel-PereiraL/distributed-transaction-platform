@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-11",
+  "scope": "F2 local synthetic ledger",
+  "command": "./mvnw.cmd -B -ntp -Pintegration clean verify",
+  "result": "BUILD SUCCESS",
+  "tests": 71,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "reactorDuration": "04:09 min",
+  "suites": [
+    {
+      "module": "ledger-domain",
+      "suite": "dev.dtp.domain.DomainTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.123
+    },
+    {
+      "module": "ledger-domain",
+      "suite": "dev.dtp.domain.PostingPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.106
+    },
+    {
+      "module": "ledger-application",
+      "suite": "dev.dtp.application.AdmissionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 4.652
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.ArchitectureTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 11.084
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.FoundationIT",
+      "tests": 31,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 69.065
+    },
+    {
+      "module": "ledger-worker",
+      "suite": "dev.dtp.worker.KafkaPostingIT",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 115.465
+    }
+  ],
+  "environment": {
+    "java": "Temurin 21.0.12.1",
+    "springBoot": "4.1.1",
+    "springKafka": "4.1.1",
+    "kafkaClient": "4.2.1",
+    "kafkaBroker": "4.2.0",
+    "postgresql": "17.6",
+    "testcontainers": "2.0.5"
+  },
+  "faultEvidence": [
+    "same-key and last-funds concurrency",
+    "concurrent posting and admission",
+    "rollback before terminal commit",
+    "broker confirmation saved nowhere / duplicate",
+    "financial commit before offset / redelivery",
+    "fenced expired claim",
+    "natural lease expiry after forcibly killed test-only JVM",
+    "unconfirmed DLT cannot advance original offset",
+    "partition resumes after quarantine recovery",
+    "transient SQL retries",
+    "audited canonical requeue"
+  ],
+  "limits": [
+    "one local broker; no cluster failover",
+    "no real money",
+    "no OS process kill at every commit boundary",
+    "no throughput/rebalance benchmark",
+    "no MongoDB/Redis/Keycloak/ACLs/exported observability/cloud",
+    "no reversal",
+    "runtime role least privilege pending"
+  ]
+}

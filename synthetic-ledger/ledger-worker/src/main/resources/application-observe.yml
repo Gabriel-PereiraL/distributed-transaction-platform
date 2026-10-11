@@ -1,0 +1,18 @@
+# Explicit local exporter configuration; absence of this profile performs no OTLP network export.
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    export:
+      otlp:
+        enabled: true
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${DTP_OTLP_ENDPOINT}
+          connect-timeout: 500ms
+          timeout: 1s
+      limits:
+        max-attributes: 16
+        max-attribute-value-length: 128

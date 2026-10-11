@@ -1,0 +1,205 @@
+openapi: 3.1.0
+info:
+  title: DTP Synthetic Ledger API
+  version: 0.1.0
+  description: Synthetic BRL only. Admission reserves funds and returns a stable ACCEPTED receipt; asynchronous processing posts or rejects the instruction. GET returns its current state. No real money is moved.
+servers:
+  - url: http://127.0.0.1:8085
+security:
+  - bearer: []
+paths:
+  /v1/transfers:
+    post:
+      operationId: admitTransfer
+      description: Requires transfer:write, signed realm role transfer-client and ownership of the source customer account. Identity comes from signed JWT claims, never the body. Replay returns the original 202 admission.
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema: {type: string, pattern: '^[A-Za-z0-9_-]{1,64}$'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TransferRequest'}
+      responses:
+        '202':
+          description: Admission committed, including hold, key, canonical event and pending outbox.
+          headers:
+            Location: {schema: {type: string}, description: Authoritative transfer status URL}
+            Idempotent-Replayed: {schema: {type: string, enum: ['true', 'false']}}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Admission'}
+        '429':
+          description: Authenticated tenant/client mutation quota exceeded before SQL admission. Replays count as requests.
+          headers:
+            Retry-After: {schema: {type: string, pattern: '^[0-9]+$'}}
+        '400': {$ref: '#/components/responses/Invalid'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/Hidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '413': {$ref: '#/components/responses/TooLarge'}
+        '422': {$ref: '#/components/responses/Mismatch'}
+        '500': {$ref: '#/components/responses/Failure'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /v1/transfers/{id}:
+    get:
+      operationId: getTransfer
+      description: Requires transfer:read and signed realm role transfer-client or auditor. A client sees its initiated transfer; an auditor may read within its signed tenant.
+      parameters:
+        - {$ref: '#/components/parameters/Id'}
+      responses:
+        '200':
+          description: Authoritative current transfer state from SQL.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Transfer'}
+        '400': {$ref: '#/components/responses/Invalid'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/Hidden'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /v1/accounts/{id}:
+    get:
+      operationId: getAccount
+      description: Requires transfer:read and signed realm role transfer-client or auditor. Clients require current ownership; auditors are tenant-bound. Technical funding accounts are never exposed.
+      parameters:
+        - {$ref: '#/components/parameters/Id'}
+      responses:
+        '200':
+          description: SQL balance and reservations, in integer BRL cents.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Account'}
+        '400': {$ref: '#/components/responses/Invalid'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/Hidden'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /v1/transfers/{id}/requeue:
+    post:
+      operationId: requeueCanonicalTransfer
+      description: Requires transfer:operate and signed operator role. Atomically resets the original accepted-event delivery and appends audit, with no network I/O or financial mutation. Live publishing lease blocks reset. Terminal transfers are audited no-ops.
+      parameters:
+        - {$ref: '#/components/parameters/Id'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [reason]
+              properties:
+                reason: {type: string, minLength: 1, maxLength: 256}
+      responses:
+        '202':
+          description: Durable canonical delivery queued; does not assert broker confirmation.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Requeue'}
+        '200':
+          description: Already terminal; audited with no delivery or financial change.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Requeue'}
+        '400': {$ref: '#/components/responses/Invalid'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/Hidden'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '429': {$ref: '#/components/responses/QuotaExceeded'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /v1/accounts/{id}/legacy:
+    get:
+      operationId: getLegacyMetadata
+      description: Optional local laboratory integration. Requires transfer:read, transfer-client and current ownership. SQL authorization completes before remote HTTP. Returns metadata only; no financial fallback. Route disabled unless dtp.legacy.enabled=true.
+      parameters:
+        - {$ref: '#/components/parameters/Id'}
+      responses:
+        '200':
+          description: Synthetic read-only external metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [externalReference, state]
+                properties:
+                  externalReference: {type: string, pattern: '^[A-Za-z0-9_-]{1,64}$'}
+                  state: {type: string, enum: [ACTIVE, INACTIVE]}
+        '400': {$ref: '#/components/responses/Invalid'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/Hidden'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+components:
+  securitySchemes:
+    bearer: {type: http, scheme: bearer, bearerFormat: JWT}
+  parameters:
+    Id: {in: path, name: id, required: true, schema: {type: string, format: uuid}}
+  responses:
+    Invalid: {description: 'Invalid body, key, identifier or currency; admission rolled back or never started'}
+    Unauthenticated: {description: Missing/invalid JWT; includes WWW-Authenticate; OAuth bearer error body is not an application ProblemDetail contract}
+    Forbidden: {description: Missing required OAuth scope or signed role for the operation}
+    Hidden: {description: Resource absent or outside object/tenant authorization}
+    Conflict: {description: 'Insufficient available funds, inactive account or live delivery lease; operation rolled back'}
+    QuotaExceeded:
+      description: Anchored tenant/client/operation quota exceeded before SQL mutation.
+      headers:
+        Retry-After: {description: Seconds until quota window expires., schema: {type: integer, minimum: 1}}
+    TooLarge: {description: Body exceeds 16384 bytes}
+    Mismatch: {description: Same admitted key identifies a different canonical request}
+    Failure: {description: Unexpected failure; never expose internal error text}
+    Unavailable: {description: Storage cannot complete operation; retry using the same idempotency key}
+  schemas:
+    Requeue:
+      type: object
+      additionalProperties: false
+      required: [transferId, eventId, outcome]
+      properties:
+        transferId: {type: string, format: uuid}
+        eventId: {type: string, format: uuid}
+        outcome: {type: string, enum: [QUEUED, ALREADY_TERMINAL]}
+    TransferRequest:
+      type: object
+      additionalProperties: false
+      required: [sourceAccountId, destinationAccountId, amountCents, currency]
+      properties:
+        sourceAccountId: {type: string, format: uuid}
+        destinationAccountId: {type: string, format: uuid}
+        amountCents: {type: integer, minimum: 1, maximum: 1000000000}
+        currency: {type: string, const: BRL}
+    Admission:
+      type: object
+      required: [transferId, status, acceptedAt]
+      properties:
+        transferId: {type: string, format: uuid}
+        status: {type: string, const: ACCEPTED}
+        acceptedAt: {type: string, format: date-time}
+    Transfer:
+      type: object
+      required: [id, status, sourceAccountId, destinationAccountId, amountCents, currency, acceptedAt, ruleVersion, aggregateVersion, terminalAt, rejectionReason]
+      properties:
+        id: {type: string, format: uuid}
+        status: {type: string, enum: [ACCEPTED, POSTED, REJECTED]}
+        sourceAccountId: {type: string, format: uuid}
+        destinationAccountId: {type: string, format: uuid}
+        amountCents: {type: integer, minimum: 1, maximum: 1000000000}
+        currency: {type: string, const: BRL}
+        acceptedAt: {type: string, format: date-time}
+        ruleVersion: {type: string, const: synthetic-v1}
+        aggregateVersion: {type: integer, enum: [1, 2]}
+        terminalAt: {type: [string, 'null'], format: date-time}
+        rejectionReason: {type: [string, 'null'], enum: [ACCOUNT_INACTIVE, SYNTHETIC_LIMIT, null]}
+    Account:
+      type: object
+      required: [id, currency, balanceCents, reservedCents, availableCents]
+      properties:
+        id: {type: string, format: uuid}
+        currency: {type: string, const: BRL}
+        balanceCents: {type: integer, minimum: 0}
+        reservedCents: {type: integer, minimum: 0}
+        availableCents: {type: integer, minimum: 0}

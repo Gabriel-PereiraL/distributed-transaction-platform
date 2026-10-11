@@ -1,0 +1,173 @@
+{
+  "date": "2026-10-11",
+  "command": "./mvnw.cmd -B -ntp -Pintegration clean verify",
+  "result": "BUILD SUCCESS",
+  "tests": 129,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "reactorDuration": "08:08 min",
+  "durationIsBenchmark": false,
+  "suites": [
+    {
+      "module": "ledger-domain",
+      "suite": "dev.dtp.domain.DomainTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-domain",
+      "suite": "dev.dtp.domain.PostingPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-application",
+      "suite": "dev.dtp.application.AdmissionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "event-contracts",
+      "suite": "dev.dtp.contracts.TransferEventDecoderTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-adapters",
+      "suite": "dev.dtp.adapters.legacy.DirectoryHttpTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.ArchitectureTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.RoleSecurityTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.FoundationIT",
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.GlobalQuotaIT",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.KeycloakIdentityIT",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-api",
+      "suite": "dev.dtp.api.RuntimePrivilegesIT",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-worker",
+      "suite": "dev.dtp.worker.KafkaPostingIT",
+      "tests": 18,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "ledger-worker",
+      "suite": "dev.dtp.worker.KafkaSecurityIT",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "activity-service",
+      "suite": "dev.dtp.activity.ProjectionArchitectureTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "activity-service",
+      "suite": "dev.dtp.activity.RoleSecurityTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "module": "activity-service",
+      "suite": "dev.dtp.activity.ActivityProjectionIT",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "contractValidation": "Two OpenAPI specifications, real requeue/legacy/Activity HTTP responses, persisted financial events and broker quarantine validated",
+  "keycloak": {
+    "version": "26.8.0",
+    "digest": "sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741"
+  },
+  "resilience4j": "2.4.0 core modules",
+  "evidence": [
+    "real Keycloak PKCE S256, single-use code, nonce, redirect and disabled password grant",
+    "issuer/audience/signature rejection and rotation with one cached decoder",
+    "runtime realm template imports environment; native tenant attribute and scoped technical operator",
+    "role and scope together; no implicit admin financial rights",
+    "auditor customer/transfer/Activity reads confined to signed tenant",
+    "canonical requeue audit+reset SQL atomicity, live lease refusal, expired lease fencing and terminal no-op",
+    "separate operator/admission Redis buckets, seventh requeue denied before SQL",
+    "restricted database identities admit/requeue/post; DDL/trigger/Flyway/cross-role writes denied",
+    "legacy authorized HTTP occurs without API idle-in-transaction; unauthorized owner never calls remote",
+    "legacy breaker recovers, bulkhead isolates, stalled chunked body times out and oversized/financial payload rejected",
+    "TLS hostname verification, encrypted broker and mutually authenticated controller",
+    "distinct SASL secrets and actual negative topic/group/DLT ACL cases",
+    "Boot secure Kafka profile binds consumer/producer settings and Spring Kafka publishes using restricted worker identity"
+  ],
+  "limits": [
+    "local fixtures/start-dev HTTP issuer and callback",
+    "single broker and laboratory certificates",
+    "full secure three-host financial E2E is F8",
+    "no tenant RLS",
+    "old local CLI uses flag/database gate",
+    "HTTP audit stores signed subject and tenant, not broker confirmation",
+    "Mongo history/snapshot not atomically co-visible",
+    "no cache/recipient feed/reversal",
+    "no exporter/dashboard/benchmark/cloud/deploy/apply"
+  ]
+}

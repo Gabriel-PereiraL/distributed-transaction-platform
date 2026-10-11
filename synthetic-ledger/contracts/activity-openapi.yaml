@@ -1,0 +1,110 @@
+openapi: 3.1.0
+info:
+  title: DTP Activity projection API
+  version: 0.1.0
+  description: Private derived receipts. PostgreSQL remains authoritative; a missing projection may be delayed. No ledger database access or financial mutations.
+servers:
+  - url: http://127.0.0.1:8086
+security:
+  - bearer: []
+paths:
+  /v1/activity/transfers:
+    get:
+      operationId: listOwnedActivity
+      description: Requires activity:read, signed realm role transfer-client or auditor, dtp-activity audience and JWT tenant/subject. Clients see initiated transfers; auditors are tenant-bound. Cursor order is acceptedAt descending then transfer ID descending.
+      parameters:
+        - in: query
+          name: limit
+          schema: {type: integer, minimum: 1, maximum: 100, default: 20}
+        - in: query
+          name: cursor
+          schema: {type: string, maxLength: 128}
+      responses:
+        '200':
+          description: Owned receipts with opaque continuation cursor.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, nextCursor]
+                properties:
+                  items: {type: array, items: {$ref: '#/components/schemas/Receipt'}}
+                  nextCursor: {type: [string, 'null']}
+        '400': {$ref: '#/components/responses/Invalid'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /v1/activity/transfers/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: {type: string, format: uuid}
+    get:
+      operationId: getOwnedProjection
+      responses:
+        '200':
+          description: Derived receipt and projection version/time. Response is no-store.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Receipt'}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/Missing'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /v1/activity/transfers/{id}/events:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: {type: string, format: uuid}
+    get:
+      operationId: getOwnedProjectionHistory
+      description: Separate bounded history collection; owner/tenant authorization is checked against the snapshot first.
+      responses:
+        '200':
+          description: At most 20 facts in aggregate-version order; no unbounded embedded array.
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 20
+                items:
+                  type: object
+                  required: [eventId, eventType, aggregateVersion, occurredAt, status, rejectionReason]
+                  properties:
+                    eventId: {type: string, format: uuid}
+                    eventType: {enum: [TransferAccepted, TransferPosted, TransferRejected]}
+                    aggregateVersion: {type: integer, enum: [1, 2]}
+                    occurredAt: {type: string, format: date-time}
+                    status: {enum: [ACCEPTED, POSTED, REJECTED]}
+                    rejectionReason: {type: [string, 'null']}
+        '401': {$ref: '#/components/responses/Unauthenticated'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {$ref: '#/components/responses/Missing'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+components:
+  securitySchemes:
+    bearer: {type: http, scheme: bearer, bearerFormat: JWT}
+  schemas:
+    Receipt:
+      type: object
+      required: [id, status, projectionVersion, projectionUpdatedAt, sourceAccountId, destinationAccountId, amountCents, currency, acceptedAt, terminalAt, rejectionReason]
+      properties:
+        id: {type: string, format: uuid}
+        status: {enum: [ACCEPTED, POSTED, REJECTED]}
+        projectionVersion: {type: integer, enum: [1, 2]}
+        projectionUpdatedAt: {type: string, format: date-time}
+        sourceAccountId: {type: string, format: uuid}
+        destinationAccountId: {type: string, format: uuid}
+        amountCents: {type: integer, minimum: 1, maximum: 1000000000}
+        currency: {const: BRL}
+        acceptedAt: {type: string, format: date-time}
+        terminalAt: {type: [string, 'null'], format: date-time}
+        rejectionReason: {type: [string, 'null']}
+  responses:
+    Invalid: {description: Invalid bounded cursor/limit.}
+    Unauthenticated: {description: Invalid signature/issuer/audience/time/identity.}
+    Forbidden: {description: 'Missing read scope or signed transfer-client/auditor role, or mutation denied.'}
+    Missing: {description: Uniform hidden/not-yet-projected response.}
+    Unavailable: {description: MongoDB unavailable; no invented financial fallback.}

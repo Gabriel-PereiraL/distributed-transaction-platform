@@ -1,0 +1,40 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "urn:dtp:transfer-terminal:v1",
+ "title": "TransferPosted / TransferRejected v1",
+ "type": "object",
+ "additionalProperties": false,
+ "required": ["eventId","eventType","schemaVersion","tenantId","aggregateId","aggregateVersion","occurredAt","payload","correlationId","traceparent"],
+ "properties": {
+  "eventId": {"type":"string","format":"uuid"},
+  "eventType": {"enum":["TransferPosted","TransferRejected"]},
+  "schemaVersion": {"const":1},
+  "tenantId": {"type":"string","format":"uuid"},
+  "aggregateId": {"type":"string","format":"uuid"},
+  "aggregateVersion": {"const":2},
+  "occurredAt": {"type":"string","format":"date-time"},
+  "correlationId": {"type":"string","pattern":"^[A-Za-z0-9_-]{1,64}$"},
+  "traceparent": {"type":["string","null"],"pattern":"^00-[0-9a-f]{32}-[0-9a-f]{16}-[0-9a-f]{2}$"},
+  "payload": {
+   "type":"object","additionalProperties":false,
+   "required":["id","tenantId","initiatedBy","sourceAccountId","destinationAccountId","amount","acceptedAt","ruleVersion","status","terminalAt","rejectionReason"],
+   "properties": {
+    "id":{"type":"string","format":"uuid"},
+    "tenantId":{"type":"string","format":"uuid"},
+    "initiatedBy":{"type":"string","minLength":1,"maxLength":128},
+    "sourceAccountId":{"type":"string","format":"uuid"},
+    "destinationAccountId":{"type":"string","format":"uuid"},
+    "amount":{"type":"object","additionalProperties":false,"required":["cents","currency"],"properties":{"cents":{"type":"integer","minimum":1,"maximum":1000000000},"currency":{"const":"BRL"}}},
+    "acceptedAt":{"type":"string","format":"date-time"},
+    "ruleVersion":{"const":"synthetic-v1"},
+    "status":{"enum":["POSTED","REJECTED"]},
+    "terminalAt":{"type":"string","format":"date-time"},
+    "rejectionReason":{"type":["string","null"],"enum":[null,"ACCOUNT_INACTIVE","SYNTHETIC_LIMIT"]}
+   }
+  }
+ },
+ "allOf":[
+  {"if":{"properties":{"eventType":{"const":"TransferPosted"}}},"then":{"properties":{"payload":{"properties":{"status":{"const":"POSTED"},"rejectionReason":{"const":null}}}}}},
+  {"if":{"properties":{"eventType":{"const":"TransferRejected"}}},"then":{"properties":{"payload":{"properties":{"status":{"const":"REJECTED"},"rejectionReason":{"enum":["ACCOUNT_INACTIVE","SYNTHETIC_LIMIT"]}}}}}}
+ ]
+}
