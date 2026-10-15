@@ -1,0 +1,96 @@
+name: Local quality gates
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  java:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: synthetic-ledger
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: {persist-credentials: false}
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with: {python-version: '3.12'}
+      - run: chmod +x mvnw && ./mvnw -B -ntp clean verify -Pintegration
+      - run: python -m pip install -r scripts/requirements-contracts.txt && python scripts/validate-contracts.py
+      - run: python scripts/collect-test-summary.py ../safe-evidence/test-summary.json
+      - run: ./mvnw -B -ntp verify
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: test-counts
+          path: safe-evidence/test-summary.json
+          retention-days: 7
+          if-no-files-found: error
+  static-and-images:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: {persist-credentials: false}
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e
+        with: {terraform_version: '1.16.6', terraform_wrapper: false}
+      - shell: pwsh
+        run: ./synthetic-ledger/infra/terraform/validate-static.ps1 -Terraform (Get-Command terraform).Source
+      - name: Install verified scanner
+        run: |
+          curl --fail --location --retry 3 -o /tmp/trivy.tgz https://github.com/aquasecurity/trivy/releases/download/v0.76.0/trivy_0.76.0_Linux-64bit.tar.gz
+          echo 'e24b1c51293c1b15e4ba8d45bbc7891ba053f90278ec2698f3562c993e145fe7  /tmp/trivy.tgz' | sha256sum -c -
+          mkdir /tmp/trivy-bin && tar -xzf /tmp/trivy.tgz -C /tmp/trivy-bin trivy
+      - run: /tmp/trivy-bin/trivy config --exit-code 1 --severity HIGH,CRITICAL synthetic-ledger/infra
+      - name: Scan source for secrets
+        run: /tmp/trivy-bin/trivy filesystem --scanners secret --exit-code 1 --severity HIGH,CRITICAL --skip-dirs '**/target' --skip-dirs '**/.terraform' --skip-dirs '**/.local-secrets' --skip-dirs '**/.git' .
+      - name: Validate and package local chart
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 -o /tmp/helm.tgz https://get.helm.sh/helm-v4.3.0-linux-amd64.tar.gz
+          echo '86584a54def73570558f66f5111cc53dfed56689637ae32c1201205d494f54fb  /tmp/helm.tgz' | sha256sum -c -
+          mkdir /tmp/helm-bin && tar -xzf /tmp/helm.tgz -C /tmp/helm-bin linux-amd64/helm
+          helm=/tmp/helm-bin/linux-amd64/helm
+          chart=synthetic-ledger/infra/helm/dtp
+          "$helm" lint "$chart"
+          "$helm" template dtp "$chart" >/dev/null
+          for values in values-local.yaml values-test.yaml values-future.yaml; do
+            "$helm" template dtp "$chart" -f "$chart/$values" >/dev/null
+          done
+          if "$helm" template dtp "$chart" --set application.enabled=true --set apps.ledger-worker.replicas=4 >/dev/null 2>&1; then
+            echo 'Worker partition bound was not enforced' >&2; exit 1
+          fi
+          mkdir chart-package && "$helm" package "$chart" -d chart-package
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: local-chart
+          path: chart-package/*.tgz
+          retention-days: 7
+          if-no-files-found: error
+      - name: Build and scan local images
+        run: |
+          set -euo pipefail
+          for module in ledger-api ledger-worker activity-service; do
+            docker build --build-arg RUNTIME_MODULE="$module" -t "dtp-$module:ci" synthetic-ledger
+            /tmp/trivy-bin/trivy image --timeout 20m --scanners vuln --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 "dtp-$module:ci"
+          done
+          docker build -f synthetic-ledger/infra/container/Keycloak.Dockerfile -t dtp-keycloak:ci synthetic-ledger
+          /tmp/trivy-bin/trivy image --timeout 20m --scanners vuln --ignore-unfixed --severity HIGH,CRITICAL --exit-code 1 dtp-keycloak:ci
+  codeql:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with: {persist-credentials: false}
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with: {distribution: temurin, java-version: '21'}
+      - uses: github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d
+        with: {languages: java-kotlin, build-mode: manual}
+      - run: cd synthetic-ledger && chmod +x mvnw && ./mvnw -B -ntp -DskipTests package
+      - uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d

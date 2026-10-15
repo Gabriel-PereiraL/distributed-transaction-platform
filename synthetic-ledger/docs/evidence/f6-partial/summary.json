@@ -1,0 +1,77 @@
+{
+  "status": "F6 incomplete, benchmark failed",
+  "runs": [
+    {
+      "run": "baseline-500ms-0",
+      "expected_responses": 21,
+      "unexpected_responses": 0,
+      "p95_ms": 166.541,
+      "p99_ms": 209.44988000000004,
+      "dropped_iterations": 0
+    },
+    {
+      "run": "baseline-500ms-1",
+      "expected_responses": 20,
+      "unexpected_responses": 0,
+      "p95_ms": 93.678555,
+      "p99_ms": 97.184511,
+      "dropped_iterations": 0
+    },
+    {
+      "run": "baseline-500ms-2",
+      "expected_responses": 20,
+      "unexpected_responses": 0,
+      "p95_ms": 253.684325,
+      "p99_ms": 277.794945,
+      "dropped_iterations": 0
+    },
+    {
+      "run": "tuned-20ms-0",
+      "expected_responses": 158,
+      "unexpected_responses": 0,
+      "p95_ms": 1749.8893850000006,
+      "p99_ms": 2715.663677,
+      "dropped_iterations": 14
+    },
+    {
+      "run": "tuned-20ms-1",
+      "expected_responses": 169,
+      "unexpected_responses": 0,
+      "p95_ms": 625.7650199999999,
+      "p99_ms": 764.920448,
+      "dropped_iterations": 3
+    },
+    {
+      "run": "tuned-20ms-2",
+      "expected_responses": 164,
+      "unexpected_responses": 0,
+      "p95_ms": 859.7335249999998,
+      "p99_ms": 1474.0151910000004,
+      "dropped_iterations": 9
+    },
+    {
+      "run": "two-api-two-worker-0",
+      "expected_responses": 165,
+      "unexpected_responses": 0,
+      "p95_ms": 1499.8531799999998,
+      "p99_ms": 2179.3249919999894,
+      "dropped_iterations": 8
+    },
+    {
+      "run": "two-api-two-worker-1",
+      "expected_responses": 129,
+      "unexpected_responses": 1,
+      "p95_ms": 7096.56004,
+      "p99_ms": 8949.702470999997,
+      "dropped_iterations": 43
+    }
+  ],
+  "facts": [
+    "100 customer accounts, 50 funded source/destination pairs, shared four-logical-CPU 16GB host.",
+    "Baseline uses distributed sources and 500ms publication; tuned scenarios use a hot pair and 20ms. This changes more than one variable.",
+    "Two API contexts share one JVM; two worker processes are separate. No independent API process scaling claim.",
+    "Completed earlier runs drained and passed SQL/Mongo financial checks before successful query runs.",
+    "Last failed run did not reach final financial checks. No full baseline or JFR was saved in that execution.",
+    "SQLSTATE57014 matches query cancellation; transaction timeout is10s. Root cause remains unproven."
+  ]
+}

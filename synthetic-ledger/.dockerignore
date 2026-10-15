@@ -1,0 +1,14 @@
+**/target
+.git
+**/.env
+**/.env.*
+.local-secrets
+**/*.pem
+**/*.key
+**/*.p12
+**/*.jks
+**/*.jfr
+**/*.log
+**/.terraform
+**/terraform.tfstate*
+**/*.zip

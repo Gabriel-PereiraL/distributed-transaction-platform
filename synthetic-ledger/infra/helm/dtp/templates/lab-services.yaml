@@ -1,0 +1,21 @@
+{{- if .Values.lab.enabled }}
+{{- range $name, $port := dict "postgres" 5432 "kafka" 9093 "mongo" 27017 "redis" 6379 "keycloak" 8080 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels: {app.kubernetes.io/part-of: dtp}
+spec:
+  type: {{ if eq $name "keycloak" }}NodePort{{ else }}ClusterIP{{ end }}
+  publishNotReadyAddresses: {{ if eq $name "mongo" }}true{{ else }}false{{ end }}
+  selector: {app.kubernetes.io/name: {{ $name }}}
+  ports:
+    - name: client
+      port: {{ $port }}
+      targetPort: {{ $port }}
+{{- if eq $name "keycloak" }}
+      nodePort: 30080
+{{- end }}
+{{- end }}
+{{- end }}

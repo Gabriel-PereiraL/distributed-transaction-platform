@@ -63,6 +63,10 @@ logging:
     format:
       console: ecs
 management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
   tracing:
     export:
       otlp:

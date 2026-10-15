@@ -1,0 +1,33 @@
+rule_files: [alerts.yaml]
+evaluation_interval: 5s
+tests:
+  - interval: 5s
+    input_series:
+      - series: dtp_outbox_unconfirmed_total
+        values: "0 0 1+0x24"
+      - series: 'up{job="dtp-collector"}'
+        values: "1 1 0 0 0 0 0 1+0x18"
+    alert_rule_test:
+      - eval_time: 25s
+        alertname: DtpOutboxDeliveryUnconfirmed
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+            exp_annotations:
+              summary: Outbox publication has unconfirmed attempts
+              runbook: RUNBOOK_F5.md#outbox
+      - eval_time: 90s
+        alertname: DtpOutboxDeliveryUnconfirmed
+        exp_alerts: []
+      - eval_time: 25s
+        alertname: DtpCollectorUnavailable
+        exp_alerts:
+          - exp_labels:
+              job: dtp-collector
+              severity: warning
+            exp_annotations:
+              summary: Local telemetry scrape is unavailable
+              runbook: RUNBOOK_F5.md#collector
+      - eval_time: 45s
+        alertname: DtpCollectorUnavailable
+        exp_alerts: []

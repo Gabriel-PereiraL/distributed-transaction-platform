@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-15",
+  "scope": "local kind dtp-f7 after hardening",
+  "phase_gate": "pending final review of recovery limitation",
+  "bootstrap_passed": true,
+  "scale_api": 2,
+  "scale_worker": 2,
+  "native_pkce_posted_replay_passed": true,
+  "worker_pod_recovery_passed": true,
+  "postgres_pvc_recovery_passed": true,
+  "api_drain": {
+    "scope": "local two-replica API liveness routing during graceful pod replacement",
+    "financial_inflight_drain_tested": false,
+    "requests": 100,
+    "http_200": 100,
+    "transport_failures": 0,
+    "other_statuses": [],
+    "old_pod_replaced": true
+  },
+  "first_login_after_db_recovery": {
+    "passed": false,
+    "http_status": 400,
+    "root_cause": "not established"
+  },
+  "subsequent_smoke_passed": true,
+  "financial_invariants": {
+    "transfers": 4,
+    "not_posted": 0,
+    "holds": 0,
+    "reservations": 0,
+    "negative_customer_balances": 0,
+    "unbalanced_journals": 0,
+    "posting_journals": 4,
+    "bad_materialized_balances": 0,
+    "unpublished": 0,
+    "api_can_insert_journal": false,
+    "api_can_change_balance": false,
+    "worker_can_admit": false,
+    "runtime_superusers": 0
+  },
+  "network_policy_enforced": false,
+  "identity_recovery_diagnostics": {
+    "observed_exception_types": [
+      "org.keycloak.models.ModelException",
+      "org.postgresql.util.PSQLException",
+      "javax.transaction.xa.XAException"
+    ],
+    "closed_connection_messages": 5,
+    "administrator_termination_messages": 1,
+    "native_login_error": "invalid_user_credentials",
+    "interpretation": "consistent with stale database connections after PostgreSQL restart; controlled causal test not performed"
+  }
+}

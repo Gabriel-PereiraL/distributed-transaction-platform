@@ -29,7 +29,7 @@ class KeycloakIdentityIT {
     private static final HttpClient HTTP = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
     private static final JsonMapper JSON = JsonMapper.builder().build();
     @Container @SuppressWarnings("resource")
-    static final GenericContainer<?> IDP = new GenericContainer<>("quay.io/keycloak/keycloak@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741")
+    static final GenericContainer<?> IDP = new GenericContainer<>("quay.io/keycloak/keycloak@sha256:79c623a22abacf3fe6c00a5fb30f5b7843d717b234033b80995891c06116d244")
             .withExposedPorts(8080).withCommand("start-dev", "--import-realm", "--hostname-strict=false")
             .withEnv("DTP_TENANT_ID", TENANT.toString()).withEnv("DTP_OPERATOR_SECRET", OPERATOR_SECRET).withEnv("DTP_USER_PASSWORD", PASSWORD)
             .withCopyFileToContainer(org.testcontainers.utility.MountableFile.forHostPath(java.nio.file.Path.of("../infra/keycloak/dtp-local-realm.json").toAbsolutePath()), "/opt/keycloak/data/import/dtp-local-realm.json")

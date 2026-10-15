@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-15",
+  "phase_gate": "pending",
+  "scanner": "Trivy 0.76.0",
+  "image_scope": "vulnerabilities HIGH,CRITICAL; ignore-unfixed; not a zero-vulnerability claim",
+  "images": {
+    "api": {
+      "artifact_id": "sha256:dfd9a61bfeceac117818a1fb2515090d156de1670d4ef9a8ea51ae01d8e38cd4",
+      "fixable_high_critical": 0
+    },
+    "worker": {
+      "artifact_id": "sha256:9c9a295bf30c775f1c0fb0dd26c98057f49df9bc7a41504e5746d9a466dd6f3c",
+      "fixable_high_critical": 0
+    },
+    "activity": {
+      "artifact_id": "sha256:5432c360ee70f39ade85678db832805c8e7d9fad07e5dff48bc3b5911b79d5b5",
+      "fixable_high_critical": 0
+    },
+    "keycloak": {
+      "artifact_id": "sha256:3ed142b3f6fad9a2b6c7be0a051eb4bbb4bee0cdc31ce9c0eb4063ff826d8741",
+      "fixable_high_critical": 0,
+      "version": "26.8.1"
+    }
+  },
+  "infrastructure_high_critical": 0,
+  "terraform_mock_runs_passed": 2,
+  "plain_verify_tests_passed": 52,
+  "integration_after_dependency_update": {
+    "tests": 142,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "source": "work/f7-release-integration.exit=0 and fresh safe summary"
+  },
+  "actionlint": "1.7.12 passed; shellcheck and pyflakes disabled locally",
+  "actionlint_scope": "workflow syntax/expressions, no shellcheck/pyflakes locally, no hosted execution",
+  "contracts_after_dependency_update": "passed"
+}

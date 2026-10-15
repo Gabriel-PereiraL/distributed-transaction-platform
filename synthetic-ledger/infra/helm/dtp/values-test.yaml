@@ -1,0 +1,6 @@
+application: {enabled: true}
+bootstrap: {enabled: false}
+lab: {enabled: true}
+apps:
+  ledger-api: {replicas: 2}
+  ledger-worker: {replicas: 2}

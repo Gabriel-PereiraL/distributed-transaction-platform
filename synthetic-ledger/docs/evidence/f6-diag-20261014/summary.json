@@ -1,0 +1,181 @@
+{
+  "date": "2026-10-14",
+  "diagnostic_replay": "passed",
+  "phase_gate": "F6 still open",
+  "synthetic_transfers": 1094,
+  "runs": [
+    {
+      "hot_source": false,
+      "admitted": 21,
+      "backlog_after_load": 10,
+      "drain_seconds": 14.0574589,
+      "completed_transfers_per_second": 0.8423164477243552,
+      "repetition": 0,
+      "case": "baseline-500ms",
+      "p95_ms": 435.1997,
+      "dropped_iterations": 0,
+      "max_sampled_blocked_sessions": 0,
+      "max_sampled_transaction_age_seconds": 0
+    },
+    {
+      "hot_source": false,
+      "admitted": 21,
+      "backlog_after_load": 9,
+      "drain_seconds": 13.0351807,
+      "completed_transfers_per_second": 0.8812331826088884,
+      "repetition": 1,
+      "case": "baseline-500ms",
+      "p95_ms": 212.3339,
+      "dropped_iterations": 0,
+      "max_sampled_blocked_sessions": 0,
+      "max_sampled_transaction_age_seconds": 0
+    },
+    {
+      "hot_source": false,
+      "admitted": 21,
+      "backlog_after_load": 9,
+      "drain_seconds": 13.1234591,
+      "completed_transfers_per_second": 0.8793220179356651,
+      "repetition": 2,
+      "case": "baseline-500ms",
+      "p95_ms": 193.4267,
+      "dropped_iterations": 0,
+      "max_sampled_blocked_sessions": 0,
+      "max_sampled_transaction_age_seconds": 0
+    },
+    {
+      "hot_source": true,
+      "admitted": 169,
+      "backlog_after_load": 8,
+      "drain_seconds": 3.4880418,
+      "completed_transfers_per_second": 4.648456898797988,
+      "repetition": 0,
+      "case": "tuned-20ms",
+      "p95_ms": 442.26815999999997,
+      "dropped_iterations": 4,
+      "max_sampled_blocked_sessions": 1,
+      "max_sampled_transaction_age_seconds": 0.215116
+    },
+    {
+      "hot_source": true,
+      "admitted": 168,
+      "backlog_after_load": 28,
+      "drain_seconds": 5.2092661,
+      "completed_transfers_per_second": 4.46023536497417,
+      "repetition": 1,
+      "case": "tuned-20ms",
+      "p95_ms": 529.1852600000001,
+      "dropped_iterations": 4,
+      "max_sampled_blocked_sessions": 3,
+      "max_sampled_transaction_age_seconds": 0.338855
+    },
+    {
+      "hot_source": true,
+      "admitted": 170,
+      "backlog_after_load": 29,
+      "drain_seconds": 6.3254225,
+      "completed_transfers_per_second": 4.548740000625265,
+      "repetition": 2,
+      "case": "tuned-20ms",
+      "p95_ms": 418.41654999999986,
+      "dropped_iterations": 2,
+      "max_sampled_blocked_sessions": 2,
+      "max_sampled_transaction_age_seconds": 0.357482
+    },
+    {
+      "hot_source": true,
+      "admitted": 170,
+      "backlog_after_load": 0,
+      "drain_seconds": 3.1715711,
+      "completed_transfers_per_second": 5.0127943023329715,
+      "repetition": 0,
+      "case": "two-api-two-worker",
+      "p95_ms": 326.164045,
+      "dropped_iterations": 2,
+      "max_sampled_blocked_sessions": 2,
+      "max_sampled_transaction_age_seconds": 0.190606
+    },
+    {
+      "hot_source": true,
+      "admitted": 173,
+      "backlog_after_load": 0,
+      "drain_seconds": 3.1223104,
+      "completed_transfers_per_second": 5.140194313369159,
+      "repetition": 1,
+      "case": "two-api-two-worker",
+      "p95_ms": 229.79064000000005,
+      "dropped_iterations": 0,
+      "max_sampled_blocked_sessions": 1,
+      "max_sampled_transaction_age_seconds": 0.174432
+    },
+    {
+      "hot_source": true,
+      "admitted": 167,
+      "backlog_after_load": 0,
+      "drain_seconds": 2.5832794,
+      "completed_transfers_per_second": 4.790656899463905,
+      "repetition": 2,
+      "case": "two-api-two-worker",
+      "p95_ms": 1026.1719199999998,
+      "dropped_iterations": 5,
+      "max_sampled_blocked_sessions": 4,
+      "max_sampled_transaction_age_seconds": 1.064062
+    }
+  ],
+  "jfr": {
+    "scope": "API JVM including warmups and second API context startup",
+    "execution_samples": 363,
+    "gc_pause_ms": 181.450635,
+    "max_observed_heap_bytes": 132120480,
+    "host_cpu_mean": 0.9509586285622347,
+    "top_frames": [
+      {
+        "method": "java.util.concurrent.ThreadPoolExecutor#runWorker",
+        "samples": 10
+      },
+      {
+        "method": "io.netty.util.HashedWheelTimer$Worker#run",
+        "samples": 7
+      },
+      {
+        "method": "java.util.concurrent.locks.AbstractQueuedSynchronizer#release",
+        "samples": 6
+      },
+      {
+        "method": "java.lang.Class#cast",
+        "samples": 6
+      },
+      {
+        "method": "org.springframework.beans.factory.support.DefaultListableBeanFactory#doGetBeanNamesForType",
+        "samples": 5
+      },
+      {
+        "method": "org.springframework.beans.factory.support.AbstractBeanFactory#getMergedLocalBeanDefinition",
+        "samples": 4
+      },
+      {
+        "method": "java.util.concurrent.ScheduledThreadPoolExecutor#reExecutePeriodic",
+        "samples": 4
+      },
+      {
+        "method": "java.lang.Thread#afterSleep",
+        "samples": 3
+      },
+      {
+        "method": "jdk.internal.event.ThreadSleepEvent#commit",
+        "samples": 3
+      },
+      {
+        "method": "jdk.jfr.internal.periodic.PeriodicTask#run",
+        "samples": 3
+      }
+    ]
+  },
+  "limitations": [
+    "Prior failure did not reproduce; no financial timeout was changed.",
+    "Host CPU averaged about95%; this is not an isolated capacity benchmark.",
+    "API instances share one JVM; workload/rates differ between baseline and tuned cases.",
+    "Sampled transaction age is not a direct lock wait duration.",
+    "No independent API process scaling, production SLO or causal speedup claim."
+  ]
+}

@@ -1,0 +1,179 @@
+name: dtp-f7
+x-app: &app
+  restart: unless-stopped
+  read_only: true
+  tmpfs: ['/tmp:rw,noexec,nosuid,size=128m']
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  mem_limit: 512m
+  cpus: 0.75
+  stop_grace_period: 30s
+  networks: [dtp]
+  logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+services:
+  postgres:
+    image: postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+    environment:
+      POSTGRES_USER: dtp_admin
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-admin.password
+    secrets: [postgres-admin.password, postgres-owner.password, postgres-api.password, postgres-worker.password, postgres-keycloak.password]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/10-dtp.sh:ro
+    healthcheck: {test: [CMD-SHELL, 'pg_isready -U dtp_admin -d postgres'], interval: 5s, timeout: 3s, retries: 30}
+    mem_limit: 512m
+    networks: [dtp]
+  migrate:
+    <<: *app
+    image: dtp-ledger-api:f7
+    restart: 'no'
+    env_file: ../../.local-secrets/migrate.env
+    command: [migrate]
+    healthcheck: {disable: true}
+    depends_on: {postgres: {condition: service_healthy}}
+  grants-seed:
+    image: postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+    user: postgres
+    entrypoint: [/bin/bash, /infra/grants-and-seed.sh]
+    secrets: [postgres-admin.password, postgres-owner.password]
+    volumes:
+      - ./grants-and-seed.sh:/infra/grants-and-seed.sh:ro
+      - ../postgres/runtime-grants.sql:/infra/runtime-grants.sql:ro
+      - ../../docs/local-seed-keycloak.sql:/infra/local-seed-keycloak.sql:ro
+    depends_on: {migrate: {condition: service_completed_successfully}}
+    networks: [dtp]
+  kafka-volume-init:
+    image: apache/kafka@sha256:9516fb7634bad307d17c33b589fde9023003b0cb761374f500002b980a3149b9
+    user: root
+    entrypoint: [/bin/bash, -ec]
+    command: ['mkdir -p /var/lib/kafka/data && chown -R 1000:1000 /var/lib/kafka/data']
+    volumes: [kafka-data:/var/lib/kafka/data]
+    networks: [dtp]
+  kafka:
+    image: apache/kafka@sha256:9516fb7634bad307d17c33b589fde9023003b0cb761374f500002b980a3149b9
+    command: [/bin/bash, /infra/kafka-start.sh]
+    secrets: [kafka-server.properties, kafka-admin.properties, server.p12, truststore.p12]
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+      - ./kafka-start.sh:/infra/kafka-start.sh:ro
+    depends_on: {kafka-volume-init: {condition: service_completed_successfully}}
+    healthcheck:
+      test: [CMD-SHELL, 'KAFKA_HEAP_OPTS="-Xms32m -Xmx128m" /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server kafka:9093 --command-config /run/secrets/kafka-admin.properties >/dev/null 2>&1']
+      interval: 15s
+      timeout: 12s
+      retries: 15
+      start_period: 30s
+    mem_limit: 1g
+    networks: [dtp]
+  kafka-init:
+    image: apache/kafka@sha256:9516fb7634bad307d17c33b589fde9023003b0cb761374f500002b980a3149b9
+    command: [/bin/bash, /infra/kafka-init.sh]
+    secrets: [kafka-admin.properties, truststore.p12]
+    volumes: [./kafka-init.sh:/infra/kafka-init.sh:ro]
+    depends_on: {kafka: {condition: service_healthy}}
+    mem_limit: 256m
+    networks: [dtp]
+  mongo:
+    image: mongo@sha256:d0d926f94df099bff534b7ee5b5986458131a22489dfff8664509af0c1e2ca9c
+    entrypoint: [/bin/bash, /infra/mongo-start.sh]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dtp_admin
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/mongo-admin.password
+    secrets: [mongo-admin.password, mongo.key]
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+      - ./mongo-start.sh:/infra/mongo-start.sh:ro
+      - ./mongo-health.js:/infra/mongo-health.js:ro
+    healthcheck: {test: [CMD, mongosh, --quiet, /infra/mongo-health.js], interval: 10s, timeout: 5s, retries: 20, start_period: 30s}
+    mem_limit: 768m
+    networks: [dtp]
+  mongo-init:
+    image: mongo@sha256:d0d926f94df099bff534b7ee5b5986458131a22489dfff8664509af0c1e2ca9c
+    entrypoint: [mongosh, --quiet, --host, mongo, /infra/mongo-init.js]
+    secrets: [mongo-admin.password, mongo-activity.password]
+    volumes: [./mongo-init.js:/infra/mongo-init.js:ro]
+    depends_on: {mongo: {condition: service_healthy}}
+    mem_limit: 256m
+    networks: [dtp]
+  redis:
+    image: redis@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
+    command: [redis-server, /run/secrets/redis.conf]
+    secrets: [redis.conf, redis.password]
+    volumes: [redis-data:/data]
+    healthcheck: {test: [CMD-SHELL, 'REDISCLI_AUTH="$$(cat /run/secrets/redis.password)" redis-cli --no-auth-warning ping | grep -q PONG'], interval: 5s, timeout: 3s, retries: 20}
+    mem_limit: 128m
+    networks: [dtp]
+  keycloak:
+    image: dtp-keycloak:f7
+    build: {context: ../.., dockerfile: infra/container/Keycloak.Dockerfile}
+    command: [start, --optimized, --http-enabled=true, --import-realm]
+    user: '1000:1000'
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,size=128m', '/opt/keycloak/data:rw,nosuid,uid=1000,gid=1000,size=128m']
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    env_file: ../../.local-secrets/keycloak.env
+    environment: {JAVA_OPTS_APPEND: '-Xms64m -Xmx384m'}
+    volumes: [../../.local-secrets/dtp-local-realm.json:/opt/keycloak/data/import/dtp-local-realm.json:ro]
+    ports: ['127.0.0.1:18080:8080']
+    depends_on: {postgres: {condition: service_healthy}}
+    healthcheck:
+      test: [CMD, bash, -ec, 'exec 3<>/dev/tcp/127.0.0.1/9000; printf "GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n" >&3; grep -q "200 OK" <&3']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+    mem_limit: 768m
+    networks: [dtp]
+  ledger-api:
+    <<: *app
+    image: dtp-ledger-api:f7
+    env_file: ../../.local-secrets/api.env
+    ports: ['127.0.0.1:18085:8085']
+    depends_on:
+      grants-seed: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+      keycloak: {condition: service_healthy}
+  ledger-worker:
+    <<: *app
+    image: dtp-ledger-worker:f7
+    env_file: ../../.local-secrets/worker.env
+    secrets: [truststore.p12]
+    depends_on:
+      grants-seed: {condition: service_completed_successfully}
+      kafka-init: {condition: service_completed_successfully}
+  activity:
+    <<: *app
+    image: dtp-activity:f7
+    env_file: ../../.local-secrets/activity.env
+    secrets: [truststore.p12]
+    ports: ['127.0.0.1:18086:8086']
+    depends_on:
+      kafka-init: {condition: service_completed_successfully}
+      mongo-init: {condition: service_completed_successfully}
+      keycloak: {condition: service_healthy}
+networks:
+  dtp: {driver: bridge}
+volumes:
+  postgres-data: {}
+  kafka-data: {}
+  mongo-data: {}
+  mongo-config: {}
+  redis-data: {}
+secrets:
+  postgres-admin.password: {file: ../../.local-secrets/postgres-admin.password, name: dtp-f7-postgres-admin}
+  postgres-owner.password: {file: ../../.local-secrets/postgres-owner.password}
+  postgres-api.password: {file: ../../.local-secrets/postgres-api.password}
+  postgres-worker.password: {file: ../../.local-secrets/postgres-worker.password}
+  postgres-keycloak.password: {file: ../../.local-secrets/postgres-keycloak.password}
+  kafka-server.properties: {file: ../../.local-secrets/kafka-server.properties}
+  kafka-admin.properties: {file: ../../.local-secrets/kafka-admin.properties}
+  server.p12: {file: ../../.local-secrets/server.p12}
+  truststore.p12: {file: ../../.local-secrets/truststore.p12}
+  mongo-admin.password: {file: ../../.local-secrets/mongo-admin.password}
+  mongo-activity.password: {file: ../../.local-secrets/mongo-activity.password}
+  mongo.key: {file: ../../.local-secrets/mongo.key}
+  redis.conf: {file: ../../.local-secrets/redis.conf}
+  redis.password: {file: ../../.local-secrets/redis.password}

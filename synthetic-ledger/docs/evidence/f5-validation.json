@@ -1,0 +1,175 @@
+{
+  "phase": "F5",
+  "date": "2026-10-13",
+  "tests": 136,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "code_fingerprint_sha256": "cbf95af0c7e0eaba565a4d294ee7e801062ce7e233a88827f921ba500aa3a433",
+  "suites": [
+    {
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.activity.ActivityProjectionIT"
+    },
+    {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.activity.ActivityTracingTest"
+    },
+    {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.activity.ProjectionArchitectureTest"
+    },
+    {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.activity.RoleSecurityTest"
+    },
+    {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.contracts.TransferEventDecoderTest"
+    },
+    {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.adapters.legacy.DirectoryHttpTest"
+    },
+    {
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.api.FoundationIT"
+    },
+    {
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.api.GlobalQuotaIT"
+    },
+    {
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.api.KeycloakIdentityIT"
+    },
+    {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.api.RuntimePrivilegesIT"
+    },
+    {
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.api.ArchitectureTest"
+    },
+    {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.api.RoleSecurityTest"
+    },
+    {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.application.AdmissionTest"
+    },
+    {
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.domain.DomainTest"
+    },
+    {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.domain.PostingPolicyTest"
+    },
+    {
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.worker.CollectorSignalsIT"
+    },
+    {
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.worker.KafkaPostingIT"
+    },
+    {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.worker.KafkaSecurityIT"
+    },
+    {
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "suite": "dev.dtp.worker.KafkaTracingTest"
+    }
+  ],
+  "stack_smoke": {
+    "synthetic_smoke": "passed",
+    "trace_id": "91e69eb5afb84c5f9cdcfcba7c01f90f",
+    "checks": [
+      "OTLP HTTP",
+      "Prometheus metric query",
+      "Tempo trace retrieval",
+      "Loki log query",
+      "Grafana health"
+    ],
+    "limitations": "Synthetic pipeline smoke; not a financial end-to-end test."
+  },
+  "alert_firing": {
+    "alert": "DtpCollectorUnavailable",
+    "phase": "firing",
+    "observed_utc": "2026-10-13T11:02:29.054941+00:00"
+  },
+  "alert_resolved": {
+    "alert": "DtpCollectorUnavailable",
+    "phase": "resolved",
+    "observed_utc": "2026-10-13T11:02:59.749423+00:00"
+  },
+  "dashboard": {
+    "status": "provisioned",
+    "uid": "dtp-local",
+    "panels": 4
+  },
+  "limitations": [
+    "Synthetic pipeline smoke is separate from financial integration tests.",
+    "No combined secure three-host deployment, benchmark, HA or cloud validation."
+  ]
+}

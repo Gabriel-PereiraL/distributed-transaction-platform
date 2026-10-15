@@ -1,0 +1,19 @@
+groups:
+  - name: dtp-local
+    rules:
+      - alert: DtpOutboxDeliveryUnconfirmed
+        expr: increase(dtp_outbox_unconfirmed_total[1m]) > 0
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: Outbox publication has unconfirmed attempts
+          runbook: RUNBOOK_F5.md#outbox
+      - alert: DtpCollectorUnavailable
+        expr: up{job="dtp-collector"} == 0
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: Local telemetry scrape is unavailable
+          runbook: RUNBOOK_F5.md#collector

@@ -1,0 +1,120 @@
+{{- if .Values.bootstrap.enabled }}
+{{- if not .Values.lab.enabled }}{{ fail "Local bootstrap requires the isolated lab dependencies" }}{{ end }}
+apiVersion: batch/v1
+kind: Job
+metadata: {name: dtp-migrate, labels: {app.kubernetes.io/part-of: dtp}}
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    metadata: {labels: {app.kubernetes.io/part-of: dtp}}
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: migrate
+          image: {{ index .Values.apps "ledger-api" "image" | quote }}
+          imagePullPolicy: IfNotPresent
+          args: [migrate]
+          envFrom: [{secretRef: {name: {{ .Values.existingSecrets.migrateEnv }}}}]
+          securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+          resources: {requests: {cpu: 100m, memory: 128Mi}, limits: {cpu: '1', memory: 512Mi}}
+          volumeMounts: [{name: temporary, mountPath: /tmp}]
+      volumes: [{name: temporary, emptyDir: {}}]
+---
+apiVersion: batch/v1
+kind: Job
+metadata: {name: dtp-grants-seed, labels: {app.kubernetes.io/part-of: dtp}}
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    metadata: {labels: {app.kubernetes.io/part-of: dtp}}
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+      initContainers:
+        - name: await-schema
+          securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+          image: {{ .Values.lab.postgresImage | quote }}
+          command: [/bin/bash, -ec]
+          args:
+            - >-
+              export PGPASSWORD="$(cat /run/secrets/postgres-admin.password)";
+              for attempt in $(seq 1 120); do
+              if psql -h postgres -U dtp_admin -d dtp -At -c 'SELECT count(*)>=2 FROM flyway_schema_history WHERE success' 2>/dev/null | grep -q '^t$'; then exit 0; fi;
+              sleep 1; done; exit 1
+          volumeMounts: [{name: secrets, mountPath: /run/secrets, readOnly: true}]
+          resources: {requests: {cpu: 50m, memory: 32Mi}, limits: {cpu: 500m, memory: 128Mi}}
+      containers:
+        - name: grants-seed
+          securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+          image: {{ .Values.lab.postgresImage | quote }}
+          command: [/bin/bash, /infra/grants-and-seed.sh]
+          volumeMounts:
+            - {name: secrets, mountPath: /run/secrets, readOnly: true}
+            - {name: scripts, mountPath: /infra, readOnly: true}
+          resources: {requests: {cpu: 50m, memory: 32Mi}, limits: {cpu: 500m, memory: 128Mi}}
+      volumes:
+        - {name: secrets, secret: {secretName: {{ .Values.existingSecrets.postgres }}}}
+        - {name: scripts, configMap: {name: dtp-bootstrap-scripts, defaultMode: 0555}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata: {name: dtp-kafka-init, labels: {app.kubernetes.io/part-of: dtp}}
+spec:
+  backoffLimit: 6
+  activeDeadlineSeconds: 600
+  template:
+    metadata: {labels: {app.kubernetes.io/part-of: dtp}}
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext: {runAsUser: 1000, runAsGroup: 1000, fsGroup: 1000, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: kafka-init
+          securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+          image: {{ .Values.lab.kafkaImage | quote }}
+          args: [/bin/bash, /infra/kafka-init.sh]
+          volumeMounts:
+            - {name: temporary, mountPath: /tmp}
+            - {name: logs, mountPath: /opt/kafka/logs}
+            - {name: secrets, mountPath: /run/secrets, readOnly: true}
+            - {name: scripts, mountPath: /infra, readOnly: true}
+          resources: {requests: {cpu: 100m, memory: 128Mi}, limits: {cpu: '1', memory: 256Mi}}
+      volumes:
+        - {name: temporary, emptyDir: {}}
+        - {name: logs, emptyDir: {}}
+        - {name: secrets, secret: {secretName: {{ .Values.existingSecrets.kafkaAdmin }}}}
+        - {name: scripts, configMap: {name: dtp-bootstrap-scripts, defaultMode: 0555}}
+---
+apiVersion: batch/v1
+kind: Job
+metadata: {name: dtp-mongo-init, labels: {app.kubernetes.io/part-of: dtp}}
+spec:
+  backoffLimit: 6
+  activeDeadlineSeconds: 600
+  template:
+    metadata: {labels: {app.kubernetes.io/part-of: dtp}}
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: mongo-init
+          securityContext: {readOnlyRootFilesystem: true, allowPrivilegeEscalation: false, capabilities: {drop: [ALL]}}
+          image: {{ .Values.lab.mongoImage | quote }}
+          env: [{name: HOME, value: /tmp}, {name: MONGOSH_DISABLE_TELEMETRY, value: "true"}]
+          command: [mongosh, --quiet, --host, mongo, /infra/mongo-init.js]
+          volumeMounts:
+            - {name: temporary, mountPath: /tmp}
+            - {name: secrets, mountPath: /run/secrets, readOnly: true}
+            - {name: scripts, mountPath: /infra, readOnly: true}
+          resources: {requests: {cpu: 100m, memory: 64Mi}, limits: {cpu: 500m, memory: 256Mi}}
+      volumes:
+        - {name: temporary, emptyDir: {}}
+        - {name: secrets, secret: {secretName: {{ .Values.existingSecrets.mongo }}}}
+        - {name: scripts, configMap: {name: dtp-bootstrap-scripts, defaultMode: 0555}}
+{{- end }}

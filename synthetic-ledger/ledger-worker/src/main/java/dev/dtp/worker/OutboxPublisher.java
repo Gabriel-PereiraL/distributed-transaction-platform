@@ -42,6 +42,7 @@ public class OutboxPublisher {
                 span.inject(record.headers());
                 try { kafka.send(record).get(10, TimeUnit.SECONDS); }
                 catch (InterruptedException | java.util.concurrent.ExecutionException | java.util.concurrent.TimeoutException | RuntimeException failure) { span.failed(failure); throw failure; }
+                tracing.published();
             }
             if (outbox.published(delivery)) metrics.counter("dtp.outbox.published").increment();
             else metrics.counter("dtp.outbox.stale_claim").increment();

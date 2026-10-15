@@ -1,0 +1,1 @@
+{"scope":"Graceful worker restart with faster local publisher; no sustained-capacity or abrupt-crash claim","financial_invariants":"passed","backlog_after_load":133,"outbox":"all PUBLISHED","synthetic_transfers":176,"projection":"all POSTED","recovery_seconds_including_worker_restart":52.8479034,"publisher_delay_ms_after_restart":20}

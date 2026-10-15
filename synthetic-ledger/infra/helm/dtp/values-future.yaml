@@ -1,0 +1,8 @@
+# Static illustrative rendering only: the local deployment script rejects this mode.
+application: {enabled: true}
+bootstrap: {enabled: false}
+lab: {enabled: false}
+apps:
+  ledger-api: {image: example.invalid/dtp-ledger-api:requires-approved-digest, nodePort: null}
+  ledger-worker: {image: example.invalid/dtp-ledger-worker:requires-approved-digest, nodePort: null}
+  activity: {image: example.invalid/dtp-activity:requires-approved-digest, nodePort: null}

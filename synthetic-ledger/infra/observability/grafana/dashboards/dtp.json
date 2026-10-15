@@ -1,0 +1,11 @@
+{
+  "uid": "dtp-local", "title": "DTP local — delivery and projection",
+  "schemaVersion": 39, "version": 1, "refresh": "5s",
+  "time": {"from": "now-15m", "to": "now"},
+  "panels": [
+    {"id": 1, "title": "Confirmed outbox publications", "type": "timeseries", "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}, "datasource": {"type": "prometheus", "uid": "dtp-prometheus"}, "targets": [{"refId": "A", "expr": "rate(dtp_outbox_published_total[1m])"}]},
+    {"id": 2, "title": "Unconfirmed delivery attempts", "type": "timeseries", "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}, "datasource": {"type": "prometheus", "uid": "dtp-prometheus"}, "targets": [{"refId": "A", "expr": "rate(dtp_outbox_unconfirmed_total[1m])"}]},
+    {"id": 3, "title": "Activity completed records", "type": "timeseries", "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}, "datasource": {"type": "prometheus", "uid": "dtp-prometheus"}, "targets": [{"refId": "A", "expr": "rate(dtp_activity_records_completed_total[1m])"}]},
+    {"id": 4, "title": "Collector scrape", "type": "stat", "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8}, "datasource": {"type": "prometheus", "uid": "dtp-prometheus"}, "targets": [{"refId": "A", "expr": "up{job=\"dtp-collector\"}"}]}
+  ]
+}

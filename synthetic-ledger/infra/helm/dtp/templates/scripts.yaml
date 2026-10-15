@@ -1,0 +1,9 @@
+{{- if .Values.lab.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dtp-bootstrap-scripts
+  labels: {app.kubernetes.io/part-of: dtp}
+data:
+{{ (.Files.Glob "files/*").AsConfig | indent 2 }}
+{{- end }}

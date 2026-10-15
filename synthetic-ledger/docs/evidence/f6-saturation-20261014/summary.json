@@ -1,0 +1,24 @@
+{
+  "status": "failed drain gate",
+  "admissions": {
+    "passes": 172,
+    "fails": 0,
+    "rate": 1
+  },
+  "admission_latency": {
+    "p(95)": 99.69432499999999,
+    "p(99)": 135.21481799999995,
+    "avg": 56.101797674418584,
+    "min": 20.8753,
+    "med": 48.965,
+    "max": 300.2973
+  },
+  "drain_budget_seconds": 90,
+  "observed_not_posted_at_timeout": 121,
+  "final_financial_invariants": "not completed",
+  "second_api_case": "not reached",
+  "load": "hot source, 2/5/10 per second for ten seconds each",
+  "publisher": "one event per tick, fixed delay 500ms; Accepted and Posted each need publishing",
+  "interpretation": "offered load exceeds ideal publisher limit; not a proven CPU, lock or 13/10 cancellation root cause",
+  "privacy": "token file removed; raw logs/JFR not exported"
+}

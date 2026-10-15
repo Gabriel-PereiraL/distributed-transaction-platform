@@ -1,6 +1,6 @@
 # Distributed Transaction Processing Platform — proposta para aprovação
 
-Data do plano: 11/10/2026. **F0–F4 locais concluídas; F3–F8 aprovadas explicitamente. F5 seguinte.** O restante descreve a arquitetura alvo; não comprova implementação de componentes futuros. Estado real e evidências: [PROGRESSO.md](PROGRESSO.md), [matriz](REQUIREMENTS_MATRIX.md) e validações no projeto.
+Data do plano: 11/10/2026. Atualização14/10: **F0–F6 locais concluídas; F3–F8 aprovadas explicitamente. F7 seguinte.** O restante descreve a arquitetura alvo; não comprova implementação de componentes futuros. Estado real e evidências: [PROGRESSO.md](PROGRESSO.md), [matriz](REQUIREMENTS_MATRIX.md) e validações no projeto.
 
 ## 1. Decisão recomendada
 

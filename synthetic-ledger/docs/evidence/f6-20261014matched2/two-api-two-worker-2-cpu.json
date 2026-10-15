@@ -1,0 +1,41 @@
+[ {
+  "host_cpu_fraction" : 0.822442556447157,
+  "generator_cpu_cores" : 0.0592127284059943,
+  "sample" : 0
+}, {
+  "host_cpu_fraction" : 0.8769705867184139,
+  "generator_cpu_cores" : 0.0,
+  "sample" : 1
+}, {
+  "host_cpu_fraction" : 0.854388827420878,
+  "generator_cpu_cores" : 0.0,
+  "sample" : 2
+}, {
+  "host_cpu_fraction" : 0.9309736134396693,
+  "generator_cpu_cores" : 0.0,
+  "sample" : 3
+}, {
+  "host_cpu_fraction" : 0.757884404503367,
+  "generator_cpu_cores" : 0.0,
+  "sample" : 4
+}, {
+  "host_cpu_fraction" : 0.5758699368080136,
+  "generator_cpu_cores" : 0.0,
+  "sample" : 5
+}, {
+  "host_cpu_fraction" : 0.4524698676199377,
+  "generator_cpu_cores" : 0.0,
+  "sample" : 6
+}, {
+  "host_cpu_fraction" : 0.49237461763810286,
+  "generator_cpu_cores" : 0.01540857880637506,
+  "sample" : 7
+}, {
+  "host_cpu_fraction" : 0.5179754307069666,
+  "generator_cpu_cores" : 0.0,
+  "sample" : 8
+}, {
+  "host_cpu_fraction" : 0.8841381106347942,
+  "generator_cpu_cores" : 0.0,
+  "sample" : 9
+} ]

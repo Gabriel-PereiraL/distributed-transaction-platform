@@ -205,6 +205,48 @@ class KafkaPostingIT {
         assertThat(dlt.toString()).doesNotContain("secret-token", "Authorization", "stackTrace");
     }
 
+    @SuppressWarnings("try") // The root scope supplies context without being referenced.
+    @Test void realBrokerCarriesTraceFromAdmissionThroughPostingAndTerminalOutbox() throws Exception {
+        var exporter = io.opentelemetry.sdk.testing.exporter.InMemorySpanExporter.create();
+        try (var provider = io.opentelemetry.sdk.trace.SdkTracerProvider.builder()
+                .setSampler(io.opentelemetry.sdk.trace.samplers.Sampler.alwaysOn())
+                .addSpanProcessor(io.opentelemetry.sdk.trace.export.SimpleSpanProcessor.create(exporter)).build()) {
+            var telemetry = io.opentelemetry.sdk.OpenTelemetrySdk.builder().setTracerProvider(provider).build();
+            var tracing = new KafkaTracing(telemetry);
+            var tracedPublisher = new OutboxPublisher(outbox, kafka, metrics, TOPIC, false, tracing);
+            var tracedProcessor = new KafkaRecordProcessor(outbox, process, json, tracing);
+            var f = fixture(1000);
+            var root = telemetry.getTracer("test").spanBuilder("admission").startSpan();
+            String parent;
+            try (var scope = root.makeCurrent()) { parent = KafkaTracing.currentTraceparent(); }
+            root.end();
+            var id = admit.execute(new Actor(f.tenant(), "alice", "test-client"), "traced-pipeline",
+                    new TransferCommand(f.source(), f.destination(), new Money(100, "BRL")), "trace-test", parent)
+                    .admission().transferId();
+            assertThat(tracedPublisher.publishOne()).isTrue();
+            var accepted = read(TOPIC, id, 1).getFirst();
+            var acceptedHeader = KafkaTracing.parent(accepted.headers(), null);
+            assertThat(acceptedHeader).isNotNull();
+            tracedProcessor.handle(accepted);
+            assertThat(status(id)).isEqualTo("POSTED");
+            var terminalParent = jdbc.queryForObject("SELECT traceparent FROM canonical_events WHERE aggregate_id=? AND aggregate_version=2", String.class, id);
+            assertThat(terminalParent).isNotNull();
+            assertThat(terminalParent.substring(3, 35)).isEqualTo(root.getSpanContext().getTraceId());
+            assertThat(tracedPublisher.publishOne()).isTrue();
+            var terminal = read(TOPIC, id, 2).stream().filter(r -> json.readTree(r.value()).get("aggregateVersion").longValue() == 2).findFirst().orElseThrow();
+            var spans = exporter.getFinishedSpanItems();
+            var producer = spans.stream().filter(s -> s.getName().equals("dtp.outbox.publish") && s.getParentSpanId().equals(root.getSpanContext().getSpanId())).findFirst().orElseThrow();
+            var consumer = spans.stream().filter(s -> s.getName().equals("dtp.posting.consume")).findFirst().orElseThrow();
+            assertThat(consumer.getParentSpanId()).isEqualTo(producer.getSpanId());
+            assertThat(terminalParent.substring(36, 52)).isEqualTo(consumer.getSpanId());
+            var terminalProducer = spans.stream().filter(s -> s.getName().equals("dtp.outbox.publish") && s.getParentSpanId().equals(consumer.getSpanId())).findFirst().orElseThrow();
+            assertThat(KafkaTracing.parent(terminal.headers(), null).substring(36, 52)).isEqualTo(terminalProducer.getSpanId());
+            assertThat(spans).allMatch(s -> s.getTraceId().equals(root.getSpanContext().getTraceId()));
+            assertThat(io.opentelemetry.api.trace.Span.current().getSpanContext().isValid()).isFalse();
+            assertBalances(f, 900, 100, 0);
+        }
+    }
+
     @Test void unavailableBrokerLeavesDurableOutboxRetryableAndNoSqlLockDuringSend() throws Exception {
         var f = fixture(1000); var id = admission(f, 100, "broker-down");
         var props = Map.<String, Object>of(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:1",
@@ -212,13 +254,30 @@ class KafkaPostingIT {
                 ProducerConfig.MAX_BLOCK_MS_CONFIG, 2000, ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 2000, ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 1000);
         var factory = new DefaultKafkaProducerFactory<String, byte[]>(props);
         try {
-            var disconnected = new OutboxPublisher(outbox, new KafkaTemplate<>(factory), metrics, TOPIC, false);
+            var sending = new CountDownLatch(1);
+            var releaseSend = new CountDownLatch(1);
+            var disconnectedKafka = new KafkaTemplate<String, byte[]>(factory) {
+                @Override public java.util.concurrent.CompletableFuture<org.springframework.kafka.support.SendResult<String, byte[]>> send(
+                        org.apache.kafka.clients.producer.ProducerRecord<String, byte[]> record) {
+                    sending.countDown();
+                    try {
+                        if (!releaseSend.await(10, TimeUnit.SECONDS)) throw new IllegalStateException("Test send barrier timed out");
+                    } catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
+                        throw new IllegalStateException("Test send barrier interrupted", interrupted);
+                    }
+                    return super.send(record);
+                }
+            };
+            var disconnected = new OutboxPublisher(outbox, disconnectedKafka, metrics, TOPIC, false);
             try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
                 var pending = executor.submit(disconnected::publishOne);
-                await().pollInterval(Duration.ofMillis(10)).atMost(Duration.ofSeconds(2)).untilAsserted(() ->
-                        assertThat(jdbc.queryForObject("SELECT status FROM outbox_deliveries", String.class)).isEqualTo("CLAIMED"));
-                new TransactionTemplate(transactions).executeWithoutResult(s ->
-                        assertThat(jdbc.queryForList("SELECT event_id FROM outbox_deliveries FOR UPDATE NOWAIT")).hasSize(1));
+                try {
+                    assertThat(sending.await(10, TimeUnit.SECONDS)).isTrue();
+                    assertThat(jdbc.queryForObject("SELECT status FROM outbox_deliveries", String.class)).isEqualTo("CLAIMED");
+                    new TransactionTemplate(transactions).executeWithoutResult(s ->
+                            assertThat(jdbc.queryForList("SELECT event_id FROM outbox_deliveries FOR UPDATE NOWAIT")).hasSize(1));
+                } finally { releaseSend.countDown(); }
                 assertThat(pending.get(10, TimeUnit.SECONDS)).isFalse();
             }
             assertThat(jdbc.queryForObject("SELECT status FROM outbox_deliveries", String.class)).isEqualTo("PENDING");

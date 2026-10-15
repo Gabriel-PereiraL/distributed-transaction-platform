@@ -1,0 +1,25 @@
+{
+  "scope": "local kind dtp-f7; before 2026-10-15 hardening",
+  "date": "2026-10-14",
+  "does_not_validate_current_hardened_manifests": true,
+  "network_policy_enforced": false,
+  "financial_invariants": {
+    "transfers": 2,
+    "not_posted": 0,
+    "holds": 0,
+    "reservations": 0,
+    "negative_customer_balances": 0,
+    "unbalanced_journals": 0,
+    "posting_journals": 2,
+    "bad_materialized_balances": 0,
+    "unpublished": 0
+  },
+  "worker_uid_changed": true,
+  "checks": {
+    "kind-smoke": true,
+    "worker-recovery": true,
+    "kind-after-recovery": true,
+    "kind-scale": true,
+    "postgres-pvc-recovery": true
+  }
+}

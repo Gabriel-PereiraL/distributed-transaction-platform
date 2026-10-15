@@ -1,0 +1,121 @@
+[ {
+  "sample" : 0,
+  "generator_cpu_cores" : 0.028175904561494113,
+  "host_cpu_fraction" : 0.7634417585424383
+}, {
+  "sample" : 1,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.492097829672258
+}, {
+  "sample" : 2,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.746579007044821
+}, {
+  "sample" : 3,
+  "generator_cpu_cores" : 0.015372178393613753,
+  "host_cpu_fraction" : 0.9038142455258534
+}, {
+  "sample" : 4,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.8233383952976626
+}, {
+  "sample" : 5,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.8582438329027133
+}, {
+  "sample" : 6,
+  "generator_cpu_cores" : 0.01553830403264983,
+  "host_cpu_fraction" : 0.8717604558618375
+}, {
+  "sample" : 7,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.8497371400841152
+}, {
+  "sample" : 8,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.6171764088349168
+}, {
+  "sample" : 9,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.3856405822436562
+}, {
+  "sample" : 10,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.3653475727520561
+}, {
+  "sample" : 11,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.264425053784621
+}, {
+  "sample" : 12,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.46093596424936334
+}, {
+  "sample" : 13,
+  "generator_cpu_cores" : 0.015377963776505089,
+  "host_cpu_fraction" : 0.7847326172449495
+}, {
+  "sample" : 14,
+  "generator_cpu_cores" : 0.03099957304908031,
+  "host_cpu_fraction" : 0.8333975236076554
+}, {
+  "sample" : 15,
+  "generator_cpu_cores" : 0.015565834263962679,
+  "host_cpu_fraction" : 0.8404583024813512
+}, {
+  "sample" : 16,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.7394439531920663
+}, {
+  "sample" : 17,
+  "generator_cpu_cores" : 0.030872482028016804,
+  "host_cpu_fraction" : 0.5911258270429045
+}, {
+  "sample" : 18,
+  "generator_cpu_cores" : 0.07733928698176615,
+  "host_cpu_fraction" : 0.5437131128400008
+}, {
+  "sample" : 19,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.3536821445255164
+}, {
+  "sample" : 20,
+  "generator_cpu_cores" : 0.015549013525800764,
+  "host_cpu_fraction" : 0.375295934367881
+}, {
+  "sample" : 21,
+  "generator_cpu_cores" : 0.015432115531187243,
+  "host_cpu_fraction" : 0.48241713853743384
+}, {
+  "sample" : 22,
+  "generator_cpu_cores" : 0.03101271551108161,
+  "host_cpu_fraction" : 0.7206969933292016
+}, {
+  "sample" : 23,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.8490254785200149
+}, {
+  "sample" : 24,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.9232016077479231
+}, {
+  "sample" : 25,
+  "generator_cpu_cores" : 0.030537508024035608,
+  "host_cpu_fraction" : 1.0
+}, {
+  "sample" : 26,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.7586499123989495
+}, {
+  "sample" : 27,
+  "generator_cpu_cores" : 0.0,
+  "host_cpu_fraction" : 0.7744932773739904
+}, {
+  "sample" : 28,
+  "generator_cpu_cores" : 0.030870057506224884,
+  "host_cpu_fraction" : 0.5986406836771884
+}, {
+  "sample" : 29,
+  "generator_cpu_cores" : 0.06154696979156552,
+  "host_cpu_fraction" : 0.46918326031592644
+} ]

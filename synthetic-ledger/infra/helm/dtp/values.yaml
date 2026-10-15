@@ -1,0 +1,44 @@
+application:
+  enabled: false
+bootstrap:
+  enabled: true
+lab:
+  enabled: true
+  storageClass: standard
+  postgresImage: postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+  kafkaImage: apache/kafka@sha256:9516fb7634bad307d17c33b589fde9023003b0cb761374f500002b980a3149b9
+  mongoImage: mongo@sha256:d0d926f94df099bff534b7ee5b5986458131a22489dfff8664509af0c1e2ca9c
+  redisImage: redis@sha256:858f009f9709ce576febc734aa78b8f6d624b82571f9ddb6bda4377c833b3499
+  keycloakImage: dtp-keycloak:f7
+existingSecrets:
+  postgres: dtp-postgres-bootstrap
+  kafka: dtp-kafka-bootstrap
+  kafkaAdmin: dtp-kafka-admin
+  kafkaClient: dtp-kafka-client
+  mongo: dtp-mongo-bootstrap
+  redis: dtp-redis
+  realm: dtp-keycloak-realm
+  keycloakEnv: dtp-keycloak-env
+  migrateEnv: dtp-migrate-env
+apps:
+  ledger-api:
+    image: dtp-ledger-api:f7
+    replicas: 1
+    port: 8085
+    nodePort: 30085
+    secret: dtp-api-env
+  ledger-worker:
+    image: dtp-ledger-worker:f7
+    replicas: 1
+    port: 8090
+    nodePort: null
+    secret: dtp-worker-env
+  activity:
+    image: dtp-activity:f7
+    replicas: 1
+    port: 8086
+    nodePort: 30086
+    secret: dtp-activity-env
+resources:
+  requests: {cpu: 100m, memory: 256Mi}
+  limits: {cpu: '1', memory: 512Mi}

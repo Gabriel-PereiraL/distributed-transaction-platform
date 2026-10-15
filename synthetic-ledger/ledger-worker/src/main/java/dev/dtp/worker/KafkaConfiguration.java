@@ -20,7 +20,11 @@ public class KafkaConfiguration {
     }
     @Bean("taskScheduler") org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler jobScheduler() {
         var scheduler = new org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(2); scheduler.setThreadNamePrefix("ledger-job-"); return scheduler;
+        scheduler.setPoolSize(2); scheduler.setThreadNamePrefix("ledger-job-");
+        scheduler.setWaitForTasksToCompleteOnShutdown(true); scheduler.setAwaitTerminationSeconds(20);
+        scheduler.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+        scheduler.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        return scheduler;
     }
     @Bean
     @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(name = "dtp.kafka.create-topics", havingValue = "true", matchIfMissing = true)

@@ -1,0 +1,15 @@
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+server:
+  address: 0.0.0.0
+  shutdown: graceful
+management:
+  endpoint:
+    health:
+      show-details: never
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db,redis

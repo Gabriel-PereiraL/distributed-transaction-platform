@@ -1,0 +1,7 @@
+apiVersion: v2
+name: dtp
+description: Local synthetic ledger application and explicitly optional lab dependencies
+type: application
+version: 0.1.0
+appVersion: 0.1.0-SNAPSHOT
+kubeVersion: '>=1.34.0-0 <1.38.0-0'

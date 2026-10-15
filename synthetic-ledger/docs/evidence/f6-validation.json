@@ -1,0 +1,163 @@
+{
+  "phase": "F6",
+  "date": "2026-10-14",
+  "status": "validated locally with stated limitations",
+  "commands": [
+    "f6-matched2-20261014",
+    "f6-recovery-20261014",
+    "f6-clean-final-20261014",
+    "f6-plain-final-20261014",
+    "f6-contracts-20261014"
+  ],
+  "tests": 136,
+  "unit_tests": 48,
+  "integration_tests": 88,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "source_sha256": "67c2379868a601f25f29ddafcfd3f24f07f57d7e87fc291d498e8f1a2e104c00",
+  "suites": [
+    {
+      "suite": "dev.dtp.activity.ActivityProjectionIT",
+      "tests": 12,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.activity.ActivityTracingTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.activity.ProjectionArchitectureTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.activity.RoleSecurityTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.contracts.TransferEventDecoderTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.adapters.legacy.DirectoryHttpTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.api.FoundationIT",
+      "tests": 36,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.api.GlobalQuotaIT",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.api.KeycloakIdentityIT",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.api.RuntimePrivilegesIT",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.api.ArchitectureTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.api.RoleSecurityTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.application.AdmissionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.domain.DomainTest",
+      "tests": 13,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.domain.PostingPolicyTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.worker.CollectorSignalsIT",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.worker.KafkaPostingIT",
+      "tests": 19,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.worker.KafkaSecurityIT",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "dev.dtp.worker.KafkaTracingTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "matched_transfers": 203,
+  "recovery_transfers": 176,
+  "limits": [
+    "Shared host and ordered warmed cases, no production capacity/SLO or causal scale claim",
+    "Default500ms publisher failed ramp drain; documented alongside successful bounded recovery",
+    "Separate13/10 SQL cancellation cause remains unproved; no claim it is fixed",
+    "Only firstAPI JFR, synthetic data/testissuer/plaintext benchmark broker",
+    "No financial timeout or production publisher configuration changed"
+  ]
+}

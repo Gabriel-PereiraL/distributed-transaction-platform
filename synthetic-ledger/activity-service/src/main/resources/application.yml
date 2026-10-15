@@ -52,6 +52,18 @@ server:
   forward-headers-strategy: none
   max-http-request-header-size: 16KB
 management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  tracing:
+    export:
+      otlp:
+        enabled: false
+  logging:
+    export:
+      otlp:
+        enabled: false
   endpoints:
     web:
       exposure:

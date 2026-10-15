@@ -1,0 +1,18 @@
+apiVersion: 1
+datasources:
+  - name: DTP Prometheus
+    uid: dtp-prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+  - name: DTP Tempo
+    uid: dtp-tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+  - name: DTP Loki
+    uid: dtp-loki
+    type: loki
+    access: proxy
+    url: http://loki:3100

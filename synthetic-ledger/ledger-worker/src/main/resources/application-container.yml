@@ -1,0 +1,24 @@
+spring:
+  main:
+    web-application-type: servlet
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+server:
+  address: 0.0.0.0
+  port: ${DTP_PORT:8090}
+  shutdown: graceful
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState,db,posting

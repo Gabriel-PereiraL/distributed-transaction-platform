@@ -1,0 +1,64 @@
+{{- if .Values.application.enabled }}
+{{- range $name, $app := .Values.apps }}
+{{- if and (eq $name "ledger-worker") (gt (int $app.replicas) 3) }}{{ fail "Worker replicas exceed the three laboratory partitions" }}{{ end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $name }}
+  labels: {app.kubernetes.io/name: {{ $name }}, app.kubernetes.io/part-of: dtp}
+spec:
+  replicas: {{ $app.replicas }}
+  revisionHistoryLimit: 2
+  progressDeadlineSeconds: 300
+  strategy: {type: RollingUpdate, rollingUpdate: {maxUnavailable: {{ if eq $name "ledger-worker" }}1{{ else }}0{{ end }}, maxSurge: {{ if eq $name "ledger-worker" }}0{{ else }}1{{ end }}}}
+  selector:
+    matchLabels: {app.kubernetes.io/name: {{ $name }}}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: {{ $name }}, app.kubernetes.io/part-of: dtp}
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 35
+      securityContext: {runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001, seccompProfile: {type: RuntimeDefault}}
+      containers:
+        - name: {{ $name }}
+          image: {{ $app.image | quote }}
+          imagePullPolicy: IfNotPresent
+          envFrom: [{secretRef: {name: {{ $app.secret }}}}]
+          ports: [{name: http, containerPort: {{ $app.port }}}]
+          securityContext: {allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: {drop: [ALL]}}
+          resources:
+{{ toYaml $.Values.resources | indent 12 }}
+          startupProbe: {httpGet: {path: /actuator/health/liveness, port: http}, periodSeconds: 5, timeoutSeconds: 3, failureThreshold: 48}
+          livenessProbe: {httpGet: {path: /actuator/health/liveness, port: http}, periodSeconds: 10, timeoutSeconds: 3, failureThreshold: 3}
+          readinessProbe: {httpGet: {path: /actuator/health/readiness, port: http}, periodSeconds: 5, timeoutSeconds: 4, failureThreshold: 2}
+          lifecycle: {preStop: {exec: {command: [/bin/sh, -c, 'sleep 5']}}}
+          volumeMounts:
+            - {name: temporary, mountPath: /tmp}
+{{- if ne $name "ledger-api" }}
+            - {name: kafka-trust, mountPath: /run/secrets, readOnly: true}
+{{- end }}
+      volumes:
+        - {name: temporary, emptyDir: {medium: Memory, sizeLimit: 128Mi}}
+{{- if ne $name "ledger-api" }}
+        - {name: kafka-trust, secret: {secretName: {{ $.Values.existingSecrets.kafkaClient }}}}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $name }}
+  labels: {app.kubernetes.io/part-of: dtp}
+spec:
+  type: {{ if $app.nodePort }}NodePort{{ else }}ClusterIP{{ end }}
+  selector: {app.kubernetes.io/name: {{ $name }}}
+  ports:
+    - name: http
+      port: {{ $app.port }}
+      targetPort: http
+{{- if $app.nodePort }}
+      nodePort: {{ $app.nodePort }}
+{{- end }}
+{{- end }}
+{{- end }}

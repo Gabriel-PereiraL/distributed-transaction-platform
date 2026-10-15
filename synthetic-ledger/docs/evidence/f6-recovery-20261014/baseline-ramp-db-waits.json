@@ -1,0 +1,22 @@
+[ {
+  "blocked_sessions" : 0,
+  "wait_type" : "running",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.02296,
+  "wait_event" : "none",
+  "sample" : 0
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.006124,
+  "wait_event" : "transactionid",
+  "sample" : 1
+}, {
+  "blocked_sessions" : 0,
+  "wait_type" : "Timeout",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.011213,
+  "wait_event" : "VacuumDelay",
+  "sample" : 2
+} ]

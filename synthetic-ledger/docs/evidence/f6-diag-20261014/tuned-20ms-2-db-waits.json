@@ -1,0 +1,120 @@
+[ {
+  "blocked_sessions" : 0,
+  "wait_type" : "running",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.020166,
+  "wait_event" : "none",
+  "sample" : 0
+}, {
+  "blocked_sessions" : 0,
+  "wait_type" : "running",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.093034,
+  "wait_event" : "none",
+  "sample" : 1
+}, {
+  "blocked_sessions" : 0,
+  "wait_type" : "running",
+  "sessions" : 1,
+  "max_transaction_seconds" : 6.46E-4,
+  "wait_event" : "none",
+  "sample" : 2
+}, {
+  "blocked_sessions" : 0,
+  "wait_type" : "running",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.009652,
+  "wait_event" : "none",
+  "sample" : 3
+}, {
+  "blocked_sessions" : 0,
+  "wait_type" : "IO",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.034802,
+  "wait_event" : "WalWrite",
+  "sample" : 4
+}, {
+  "blocked_sessions" : 0,
+  "wait_type" : "LWLock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.00375,
+  "wait_event" : "WALWrite",
+  "sample" : 5
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.020924,
+  "wait_event" : "transactionid",
+  "sample" : 6
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.033932,
+  "wait_event" : "transactionid",
+  "sample" : 7
+}, {
+  "blocked_sessions" : 0,
+  "wait_type" : "running",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.073191,
+  "wait_event" : "none",
+  "sample" : 8
+}, {
+  "blocked_sessions" : 2,
+  "wait_type" : "Lock",
+  "sessions" : 2,
+  "max_transaction_seconds" : 0.162926,
+  "wait_event" : "transactionid",
+  "sample" : 9
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.097578,
+  "wait_event" : "transactionid",
+  "sample" : 10
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.013136,
+  "wait_event" : "tuple",
+  "sample" : 11
+}, {
+  "blocked_sessions" : 0,
+  "wait_type" : "IO",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.127325,
+  "wait_event" : "WalWrite",
+  "sample" : 12
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.114152,
+  "wait_event" : "transactionid",
+  "sample" : 13
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.009668,
+  "wait_event" : "transactionid",
+  "sample" : 14
+}, {
+  "blocked_sessions" : 2,
+  "wait_type" : "Lock",
+  "sessions" : 2,
+  "max_transaction_seconds" : 0.357482,
+  "wait_event" : "transactionid",
+  "sample" : 15
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.086248,
+  "wait_event" : "tuple",
+  "sample" : 16
+} ]

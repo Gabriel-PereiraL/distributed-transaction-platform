@@ -57,6 +57,18 @@ server:
     max-http-form-post-size: 16KB
     connection-timeout: 5s
 management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+  tracing:
+    export:
+      otlp:
+        enabled: false
+  logging:
+    export:
+      otlp:
+        enabled: false
   endpoints:
     web:
       exposure:

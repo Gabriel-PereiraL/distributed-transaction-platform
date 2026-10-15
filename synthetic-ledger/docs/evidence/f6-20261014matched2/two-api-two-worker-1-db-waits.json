@@ -1,0 +1,8 @@
+[ {
+  "blocked_sessions" : 0,
+  "sample" : 0,
+  "wait_event" : "none",
+  "max_transaction_seconds" : 0.001607,
+  "sessions" : 1,
+  "wait_type" : "running"
+} ]

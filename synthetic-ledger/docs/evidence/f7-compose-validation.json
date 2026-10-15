@@ -1,0 +1,46 @@
+{
+  "scope": "local Compose",
+  "smoke": {
+    "auth": "real local Keycloak authorization_code/S256",
+    "duplicate_same_transfer": true,
+    "canonical": "POSTED",
+    "projection": "POSTED",
+    "transfer_id": "af565d08-858c-47b5-b1c9-9f1fedc1e04e",
+    "amount_cents": 25
+  },
+  "financial_invariants": {
+    "transfers": 2,
+    "not_posted": 0,
+    "holds": 0,
+    "reservations": 0,
+    "negative_customer_balances": 0,
+    "unbalanced_journals": 0,
+    "posting_journals": 2,
+    "bad_materialized_balances": 0,
+    "unpublished": 0
+  },
+  "runtime_privileges": {
+    "api_journal_insert": false,
+    "api_balance_update": false,
+    "worker_transfer_insert": false,
+    "runtime_superusers": 0
+  },
+  "images": [
+    {
+      "image": "dtp-ledger-api:f7",
+      "id": "sha256:9da5c4924b6cf622e6bf11eccfb7033e51bdd2899d166338def0d82e339c90f5",
+      "user": "10001:10001"
+    },
+    {
+      "image": "dtp-ledger-worker:f7",
+      "id": "sha256:d887dd84be5af0f1d07b3cf2568250bdf6192d2e64d095d1ff17c258afa267d3",
+      "user": "10001:10001"
+    },
+    {
+      "image": "dtp-activity:f7",
+      "id": "sha256:3c28e79eaabccdd9fc481091a9942110e891b8e15f29d7daf4cde9583917c2df",
+      "user": "10001:10001"
+    }
+  ],
+  "gate": "F7 open pending Kubernetes/Terraform/CI/current regression"
+}

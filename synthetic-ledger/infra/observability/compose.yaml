@@ -1,0 +1,47 @@
+name: dtp-observe
+services:
+  collector:
+    image: otel/opentelemetry-collector-contrib@sha256:39923a8e431bd1f57be82411999d389fcfe40857492e4365456d97a4c1f74be6
+    command: [--config=/etc/otelcol-contrib/config.yaml]
+    volumes:
+      - ./collector.yaml:/etc/otelcol-contrib/config.yaml:ro
+    ports:
+      - "127.0.0.1:14318:4318"
+    mem_limit: 160m
+  prometheus:
+    image: prom/prometheus@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e
+    command: [--config.file=/etc/prometheus/prometheus.yaml, --storage.tsdb.retention.time=2h]
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+      - ./alerts.yaml:/etc/prometheus/alerts.yaml:ro
+    ports:
+      - "127.0.0.1:19090:9090"
+    mem_limit: 256m
+  tempo:
+    image: grafana/tempo@sha256:65a5789759435f1ef696f1953258b9bbdb18eb571d5ce711ff812d2e128288a4
+    command: [-config.file=/etc/tempo.yaml]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml:ro
+    ports:
+      - "127.0.0.1:13200:3200"
+    mem_limit: 256m
+  loki:
+    image: grafana/loki@sha256:1107dd5274e0ada47e42472b7a7e71f3b2a2fe878878108f3e2f9e51528f0193
+    command: [-config.file=/etc/loki.yaml]
+    volumes:
+      - ./loki.yaml:/etc/loki.yaml:ro
+    ports:
+      - "127.0.0.1:13100:3100"
+    mem_limit: 256m
+  grafana:
+    image: grafana/grafana@sha256:b28bae15e219c998fb0e0424ed724930cc61b1f61fb404d47c862f9a23f9e572
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${DTP_GRAFANA_PASSWORD:?Set a local Grafana password}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - ./grafana:/etc/grafana/provisioning:ro
+    ports:
+      - "127.0.0.1:13000:3000"
+    mem_limit: 256m

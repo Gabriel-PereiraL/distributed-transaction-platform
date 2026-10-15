@@ -1,0 +1,85 @@
+[ {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.034235,
+  "wait_event" : "transactionid",
+  "sample" : 0
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.0559,
+  "wait_event" : "transactionid",
+  "sample" : 1
+}, {
+  "blocked_sessions" : 2,
+  "wait_type" : "Lock",
+  "sessions" : 2,
+  "max_transaction_seconds" : 0.316633,
+  "wait_event" : "transactionid",
+  "sample" : 2
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.074244,
+  "wait_event" : "tuple",
+  "sample" : 3
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.03268,
+  "wait_event" : "transactionid",
+  "sample" : 4
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.033637,
+  "wait_event" : "transactionid",
+  "sample" : 5
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.070631,
+  "wait_event" : "transactionid",
+  "sample" : 6
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.053022,
+  "wait_event" : "transactionid",
+  "sample" : 7
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.146514,
+  "wait_event" : "transactionid",
+  "sample" : 8
+}, {
+  "blocked_sessions" : 3,
+  "wait_type" : "Lock",
+  "sessions" : 3,
+  "max_transaction_seconds" : 0.338855,
+  "wait_event" : "tuple",
+  "sample" : 9
+}, {
+  "blocked_sessions" : 1,
+  "wait_type" : "Lock",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.091733,
+  "wait_event" : "transactionid",
+  "sample" : 10
+}, {
+  "blocked_sessions" : 0,
+  "wait_type" : "running",
+  "sessions" : 1,
+  "max_transaction_seconds" : 0.056625,
+  "wait_event" : "none",
+  "sample" : 11
+} ]

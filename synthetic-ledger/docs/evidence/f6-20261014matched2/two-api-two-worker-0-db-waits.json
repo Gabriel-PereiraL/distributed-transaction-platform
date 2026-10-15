@@ -1,0 +1,15 @@
+[ {
+  "blocked_sessions" : 0,
+  "sample" : 0,
+  "wait_event" : "none",
+  "max_transaction_seconds" : 3.7E-4,
+  "sessions" : 1,
+  "wait_type" : "running"
+}, {
+  "blocked_sessions" : 0,
+  "sample" : 1,
+  "wait_event" : "none",
+  "max_transaction_seconds" : 0.019589,
+  "sessions" : 1,
+  "wait_type" : "running"
+} ]

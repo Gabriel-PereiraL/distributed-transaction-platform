@@ -1,5 +1,17 @@
 # Explicit local exporter configuration; absence of this profile performs no OTLP network export.
 management:
+  otlp:
+    metrics:
+      export:
+        enabled: true
+        url: ${DTP_OTLP_METRICS_ENDPOINT:http://127.0.0.1:14318/v1/metrics}
+        step: 5s
+        connect-timeout: 500ms
+        read-timeout: 1s
+  logging:
+    export:
+      otlp:
+        enabled: true
   tracing:
     sampling:
       probability: 1.0
@@ -7,10 +19,19 @@ management:
       otlp:
         enabled: true
   opentelemetry:
+    logging:
+      export:
+        otlp:
+          endpoint: ${DTP_OTLP_LOGS_ENDPOINT:http://127.0.0.1:14318/v1/logs}
+          connect-timeout: 500ms
+          timeout: 1s
+      limits:
+        max-attributes: 16
+        max-attribute-value-length: 128
     tracing:
       export:
         otlp:
-          endpoint: ${DTP_OTLP_ENDPOINT}
+          endpoint: ${DTP_OTLP_ENDPOINT:http://127.0.0.1:14318/v1/traces}
           connect-timeout: 500ms
           timeout: 1s
       limits:

@@ -8,7 +8,18 @@
 *.p12
 *.pfx
 *.jks
+*.jfr
 **/terraform.tfstate*
 **/.terraform/
 .idea/
 .vscode/
+
+**/.local-secrets/
+**/private-config.json
+**/*.tfplan
+
+# Local handoff history and frozen delivery archives
+/history/
+/snapshots/
+**/__pycache__/
+**/*.pyc

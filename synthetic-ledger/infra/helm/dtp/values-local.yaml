@@ -1,0 +1,4 @@
+# Loopback NodePorts are mapped by the dedicated kind node config.
+application: {enabled: true}
+bootstrap: {enabled: false}
+lab: {enabled: true}

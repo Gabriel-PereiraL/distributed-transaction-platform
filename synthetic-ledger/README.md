@@ -1,6 +1,8 @@
 # DTP — Synthetic Ledger & Transaction Processing
 
-Java 21 / Spring Boot 4.1.1 / PostgreSQL / Kafka / MongoDB / Redis. F1–F4 local: atomic admission, double-entry synthetic posting, outbox/dedup/recovery, private reconstructible Activity projection and global mutation quota. Real local Keycloak/PKCE/RBAC, TLS/SASL/ACL tests, process database grants and bounded read-only legacy integration are covered. Exporters/dashboards, benchmarks and final infrastructure remain subsequent gates.
+Java 21 / Spring Boot 4.1.1 / PostgreSQL / Kafka / MongoDB / Redis. F1–F6 local: atomic admission, double-entry synthetic posting, outbox/dedup/recovery, private reconstructible Activity projection and global mutation quota. Real local Keycloak/PKCE/RBAC, TLS/SASL/ACL tests, process database grants and bounded read-only legacy integration are covered. Local OpenTelemetry/Collector, metrics, traces, selected logs, Grafana dashboard and alert checks passed F5. F6 matched local benchmarks, backlog recovery, clean136/plain48 and contracts passed within the [recorded local limits](docs/VALIDATION_F6.md). F7 infrastructure is under final local review: clean142/plain52/contracts, four custom image scans, static infrastructure checks and hardened kind smoke/scale/pod recovery passed. The first OIDC login immediately after database recovery returned HTTP400; a subsequent attempt passed. See [F7 validation and limitations](docs/VALIDATION_F7.md). F8 remains pending.
+
+[Matched benchmark](docs/BENCHMARK_F6_MATCHED.md), [backlog recovery](docs/BENCHMARK_F6_RECOVERY.md), [preserved saturation failure](docs/BENCHMARK_F6_SATURATION.md), [benchmark runbook](docs/RUNBOOK_F6.md). These are shared-host experiments, not production capacity/SLO claims.
 
 ## What is implemented
 
@@ -106,6 +108,6 @@ See [ADR-001](docs/ADR-001-foundation-boundaries.md), [ADR-002](docs/ADR-002-pos
 ## Local identity and security
 
 Use signed realm roles together with operation scopes: `transfer-client` for admission, `transfer-client` or `auditor` for tenant-bound reads, `operator` plus `transfer:operate` for canonical requeue. `admin` alone grants no financial operation. [F4 runbook](docs/RUNBOOK_F4.md) describes the local realm, native seed, runtime database grants, secure Kafka profiles and optional legacy adapter. [F4 evidence](docs/VALIDATION_F4.md) records129 clean-verification tests; [ADR-004](docs/ADR-004-local-security-and-readonly-legacy.md) defines limits.
-# Checkpoint de publicação — 11/10/2026
+# Gate F5 — 13/10/2026
 
-F0–F4 concluídas; F4 validada com 129 testes. O código inclui F5 parcial de tracing, cujo gate ainda não foi concluído: três novos testes unitários passaram, mas a última regressão Kafka teve um timeout no cenário de broker indisponível. Consulte [o progresso](../PROGRESSO.md) antes de retomar.
+F0–F5 concluídas: cleanintegration136, verify48, contratos aprovados. Trace real Kafka/posting/terminal e Collector SDK/Micrometer/profile Boot comprovados; stack local, dashboard e alertas validados. [F5 evidence](docs/VALIDATION_F5.md), [ADR-005](docs/ADR-005-local-observability.md) e [runbook](docs/RUNBOOK_F5.md). Benchmarks e demo segura conjunta permanecem fases posteriores. Consulte [o progresso](../PROGRESSO.md).

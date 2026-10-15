@@ -19,12 +19,22 @@ import org.springframework.stereotype.Component;
 @Component
 public final class KafkaTracing {
     private final io.opentelemetry.api.trace.Tracer tracer;
+    private final io.opentelemetry.api.logs.Logger logger;
     private static final TextMapGetter<Map<String, String>> GETTER = new TextMapGetter<>() {
         @Override public Iterable<String> keys(Map<String, String> carrier) { return carrier.keySet(); }
         @Override public String get(Map<String, String> carrier, String key) { return carrier.get(key); }
     };
     @Autowired KafkaTracing(ObjectProvider<OpenTelemetry> telemetry) { this(telemetry.getIfAvailable(OpenTelemetry::noop)); }
-    public KafkaTracing(OpenTelemetry telemetry) { tracer = telemetry.getTracer("dtp.transport"); }
+    public KafkaTracing(OpenTelemetry telemetry) {
+        tracer = telemetry.getTracer("dtp.transport");
+        logger = telemetry.getLogsBridge().get("dtp.transport");
+    }
+    public void published() {
+        try {
+            logger.logRecordBuilder().setContext(Context.current()).setSeverity(io.opentelemetry.api.logs.Severity.INFO)
+                    .setBody("OUTBOX_PUBLICATION_CONFIRMED").emit();
+        } catch (RuntimeException unavailable) { /* Telemetry must not alter delivery bookkeeping. */ }
+    }
     public TraceRun start(String name, SpanKind kind, String parent) {
         Map<String, String> carrier = valid(parent) ? Map.of("traceparent", parent) : Map.of();
         Context context = W3CTraceContextPropagator.getInstance().extract(Context.root(), carrier, GETTER);
